@@ -1,0 +1,30 @@
+<!doctype html>
+<html ng-app="blogApp">
+  <head>
+    <title>KenPoker</title>
+
+  </head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.1.0/firebase.js"></script>
+  <script src="https://cdn.firebase.com/libs/angularfire/2.2.0/angularfire.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="init.js"></script>
+  <script src="index.js"></script>
+
+  <body>
+    <div ng-controller="MyAuthCtrl">
+    <p>Stack : <span id="stack"></span></p>
+    <form action="">
+      <input type="range" min="1" max="100" value="50" class="slider" id="m">
+      <button>Send</button>
+    </form>
+    <p>Value: <span id="value"></span></p>
+    
+
+    </div>
+  </body>
+</html>

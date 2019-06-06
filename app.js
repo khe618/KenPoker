@@ -19,16 +19,30 @@ app.use(express.static('public'));
 
 var port = process.env.PORT || 3000;
 
-app.get('/', function(req, res){
+/*app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
-});
+});*/
+
+app.get("/login", function(req, res){
+	res.sendFile("login.html", {root: __dirname + "/public/"})
+})
+
+app.get('/messages', function(req, res){
+	db.collection("messages").find({}).toArray(function(err, result){
+		if (err) throw err;
+		else{
+    		res.json(result);
+    	}
+	})
+})
 
 io.on('connection', function(socket){
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
+    //io.emit('chat message', msg);
     var obj = {"text":msg}
     db.collection("messages").insert(obj, function(err, result){
     	if (err) throw err;
+
     })
   });
 });
