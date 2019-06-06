@@ -11,6 +11,6 @@
     "socket.io": "^1.7.4"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node app.js"
   }
 }
