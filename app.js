@@ -64,14 +64,14 @@ function dealCards(players){
 
 }
 
-function getPlayers(seats){
-	var playerIds = []
+function getSeatNums(seats){
+	var seatNums = []
 	for (var i = 1; i <= 4; i++){
 		if (seats[i] != null){
-			playerIds.push(i)
+			seatNums.push(i)
 		}
 	}
-	return playerIds;
+	return seatNums;
 }
 
 app.get("/login", function(req, res){
@@ -130,24 +130,28 @@ io.on('connection', function(socket){
   		
   		if (isValid){
   			seats[seat] = {uid:uid, stackSize:100, folded:true, amountBet:0}
-  			var playerIds = getPlayers(seats)
-  			for (var playerId of playerIds){
-  				if (seats[playerId].uid == uid){
+  			var seatNums = getSeatNums(seats)
+  			for (var seatNum of seatNums){
+  				if (seats[seatNum].uid == uid){
   					isValid = false
   				}
   			}
-  			if (playerIds.length == 2){
+  			if (seatNums.length == 2){
   				//start game
-  				for (var playerId of playerIds){
-  					seats[playerId].folded = false
+  				for (var seatNum of seatNums){
+  					seats[seatNum].folded = false
+  				}
+  				var playerIds =[]
+  				for (seatNum of seatNums){
+  					playerIds.push(seats[seatNum].uid)
   				}
   				dealCards(playerIds)
-  				result.button = playerIds[0]
-  				result.turn = playerIds[0];
-  				seats[playerIds[0]].amountBet = 1
-  				seats[playerIds[1]].amountBet = 2
+  				result.button = seatNums[0]
+  				result.turn = seatNums[0];
+  				seats[seatNums[0]].amountBet = 1
+  				seats[seatNums[1]].amountBet = 2
   				result.bet = 2;
-  				result.lastBet = playerIds[1]
+  				result.lastBet = seatNums[1]
   			}
   			db.collection('gameState').update({}, result, function(err, result2){
   				if (err) throw err;
