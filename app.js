@@ -143,7 +143,7 @@ io.on('connection', function(socket){
   				}
   				dealCards(playerIds)
   				result.button = playerIds[0]
-  				result.turn = button;
+  				result.turn = playerIds[0];
   				seats[playerIds[0]].amountBet = 1
   				seats[playerIds[1]].amountBet = 2
   				result.bet = 2;
