@@ -57,8 +57,11 @@ function dealCards(players){
 		if (connectedUsers[player]){
 			connectedUsers[player].emit('cards', cards)
 		}
+		var flop = [numToCard(deck[i]), numToCard(deck[i+1]), numToCard(deck[i+2])]
+		var turn = numToCard(deck[i+3])
+		var river = numToCard(deck[i+4])
 	}
-	db.collection("cards").update({}, {players:result}, function(err, result){
+	db.collection("cards").update({}, {players:result, flop:flop, turn:turn, river:river}, function(err, result){
 		if (err) throw err;
 	})
 
@@ -67,11 +70,116 @@ function dealCards(players){
 function getSeatNums(seats){
 	var seatNums = []
 	for (var i = 1; i <= 4; i++){
-		if (seats[i] != null){
+		if (seats[i] !== null){
 			seatNums.push(i)
 		}
 	}
 	return seatNums;
+}
+
+function getPlayersInHand(seats){
+	var players = []
+	for (var i = 1; i <= 4; i++){
+		if (seats[i] !== null && !seats[i].folded){
+			players.push(i)
+		}
+	}
+	return players;
+}
+
+function findNextPlayer(result, i){
+	var temp = i + 1;
+	temp = temp % 4;
+	var seats = result.seats
+	while (temp != i && (seats[temp] == null || seats[temp].folded)){
+		temp += 1;
+		temp %= 4;
+	}
+	return temp;
+}
+
+function determineWinner(result){
+	for (var i = 1; i <= 4; i++){
+		if (result.seats[i] !== null && !result.seats[i].folded){
+			return i
+		}
+	}
+	return -1
+}
+
+function newGame(result){
+	var seatNums = getSeatNums(result.seats)
+	for (var seatNum of seatNums){
+		result.seats[seatNum].amountBet = 0;
+		result.seats[seatNum].folded = false;
+	}
+	result.bet = 0;
+	result.button = findNextPlayer(result, result.button)
+	if (seatNums.length == 2){
+		result.lastBet = findNextPlayer(result, result.button) //big blind
+		result.seats[button].amountBet = 1;
+		result.seats[lastBet].amountBet = 2;
+	}
+	else{
+		var smallBlind = findNextPlayer(result, result.button);
+		var bigBlind = findNextPlayer(result, smallBlind)
+		result.seats[smallBlind].amountBet = 1
+		result.seats[bigBlind].amountBet = 2
+		result.lastBet = bigBlind
+	}
+	var playerIds =[]
+  	for (seatNum of seatNums){
+  		playerIds.push(seats[seatNum].uid)
+  	}
+  	result.flop = null
+  	result.turnCard = null
+  	result.river = null
+  	dealCards(playerIds)
+}
+
+function nextStreet(result){
+	var street = result.street
+	var playersInHand = getPlayersInHand(result.seats)
+	if (playersInHand.length == 1){
+		//everyone folded
+		result.seats[playersInHand[0]].stackSize += result.pot
+		newGame(result)
+		return;
+	}
+	if (street == 'river'){
+		winners = determineWinner(result)
+		for (var winner of winners){
+			result.seats[winner].stackSize += Math.floor(result.pot / winners.length)
+			newGame(result)
+		}
+	}
+	else{
+		db.collection("cards").find({}, function(err, result2){
+			if (err) throw err;
+			if (street == 'preflop'){
+				result.street = 'flop'
+				result.flop = result2.flop
+			}
+			else if (street == 'flop'){
+				result.street = 'turn'
+				result.turnCard = result2.turn
+			}
+			else if (street == 'turn'){
+				result.street = 'river';
+				result.river = result2.river
+			}
+			//var seatNums = getSeatNums(result.seats)
+			for (var i = 1; i <= 4; i++){
+				if(result.seats[i] !== null){
+					result.seats[i].amountBet = 0
+				}
+			}
+			result.bet = 0;
+			result.lastBet = result.button;
+			result.turn = findNextPlayer(result, result.button)
+		})
+		
+	}
 }
 
 app.get("/login", function(req, res){
@@ -103,7 +211,46 @@ io.on('connection', function(socket){
   		}
   	})
   })
-
+  socket.on('bet', function(bet){
+  	db.collection("gameState").findOne({}, function(err, result){
+  		if (err) throw err;
+  		var seats = result.seats;
+  		var turn = result.turn;
+  		var currentBet = result.bet
+  		if (seats[turn].stackSize >= bet && bet >= result.bet){
+  			//raise
+  			if (bet > result.bet){
+  				result.bet = bet
+  				result.lastBet = turn
+  			}
+  		}
+  		result.pot += bet - seats[turn].amountBet;
+  		seats[turn].amountBet = bet 
+  		//find next turn
+  		//special case of when BB checks preflop
+  		if (result.bet == 2 && result.street == 'preflop'){
+  			nextStreet(result)
+  		}
+  		else{
+  			turn += 1;
+  			turn = turn % 4;
+  			var seatNums = getSeatNums(seats)
+  			while (!seatNums.includes(turn) || seats[turn].folded){
+  				turn += 1;
+  				turn = turn % 4;
+  			}
+  			if (turn == result.lastBet){
+  				//give BB option to check
+  				if (!(result.bet == 2 && result.street == 'preflop')){
+  					nextStreet(result)
+  				}
+  			}
+  		}
+  		db.collection("gameState").update({}, result, function(err, result){
+  			if (err) throw err;
+  		})
+  	})
+  })
   socket.on('chat message', function(msg){
     //io.emit('chat message', msg);
     var obj = {"text":msg}
@@ -119,23 +266,25 @@ io.on('connection', function(socket){
   		if (err) throw err;
   		var seats = result.seats
   		var isValid = true
+
   		/*for (var player of players){
   			if (player.uid == uid || player.seat == seat){
   				isValid = false
   			}
   		}*/
-  		if (seats[seat] !== null){
+  		if (seats[seat] != null){
   			isValid = false
+  		}
+  		var seatNums = getSeatNums(seats)
+  		for (var seatNum of seatNums){
+  			if (seats[seatNum].uid == uid){
+  				isValid = false
+  			}
   		}
   		
   		if (isValid){
   			seats[seat] = {uid:uid, stackSize:100, folded:true, amountBet:0}
-  			var seatNums = getSeatNums(seats)
-  			for (var seatNum of seatNums){
-  				if (seats[seatNum].uid == uid){
-  					isValid = false
-  				}
-  			}
+  			
   			if (seatNums.length == 2){
   				//start game
   				for (var seatNum of seatNums){
@@ -152,6 +301,11 @@ io.on('connection', function(socket){
   				seats[seatNums[1]].amountBet = 2
   				result.bet = 2;
   				result.lastBet = seatNums[1]
+  				result.pot = 3;
+  				result.street = "preflop"
+  				result.flop = null
+  				result.turnCard = null
+  				result.river = null
   			}
   			db.collection('gameState').update({}, result, function(err, result2){
   				if (err) throw err;

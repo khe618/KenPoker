@@ -7,6 +7,7 @@ app.controller("MyAuthCtrl", ["$scope", "$rootScope", "$http", "$firebaseAuth",
       if (firebaseUser) {
           console.log("Signed in as:", firebaseUser.uid);
           uid = firebaseUser.uid
+          document.getElementById("myId").innerHTML = "My id: " + uid
       } else {
           console.log("Signed out");
       }

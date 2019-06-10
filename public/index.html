@@ -19,17 +19,26 @@
   <body>
     <div ng-controller="MyAuthCtrl">
     <button onclick="signOut()">Log out</button>
-    <form id="seat" style="display:none"action="">
+    <p id="myId">My id:</p>
+    <!--<form id="seat" style="display:none"action="">
       <input type="radio" name="seat" value="1" id="seat1"> Seat 1<br>
       <input type="radio" name="seat" value="2" id="seat2"> Seat 2<br>
       <input type="radio" name="seat" value="3" id="seat3"> Seat 3<br> 
       <input type="radio" name="seat" value="4" id="seat4"> Seat 4<br>
       <button>Take seat</button> 
-    </form>
+    </form><!-->
+    <p>Seat 1: <button class="btn btn-secondary float-right" style="display:none" id="seat1">Take seat</button></p>
+    <p id="seat1info"></p>
+    <p>Seat 2: <button class="btn btn-secondary float-right" style="display:none"  id="seat2">Take seat</button></p>
+    <p id="seat2info"></p>
+    <p>Seat 3: <button class="btn btn-secondary float-right" style="display:none" id="seat3">Take seat</button></p>
+    <p id="seat3info"></p>
+    <p>Seat 4: <button class="btn btn-secondary float-right" style="display:none" id="seat4">Take seat</button></p>
+    <p id="seat4info"></p>
     <p id="cards" style="display:none">Cards: </p>
     <p>Stack : <span id="stack"></span></p>
     <form id="bet" action="">
-      <input type="range" min="1" max="100" value="50" class="slider" id="m">
+      <input type="range" min="2" max="200" value="2" class="slider" id="m">
       <button>Send</button>
     </form>
     <p>Value: <span id="value"></span></p>
