@@ -5,6 +5,7 @@
 
   </head>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="styles.css">
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/6.1.0/firebase.js"></script>
@@ -17,8 +18,16 @@
 
   <body>
     <div ng-controller="MyAuthCtrl">
+    <button onclick="signOut()">Log out</button>
+    <form id="seat" style="display:none"action="">
+      <input type="radio" name="seat" value="1" id="seat1"> Seat 1<br>
+      <input type="radio" name="seat" value="2" id="seat2"> Seat 2<br>
+      <input type="radio" name="seat" value="3" id="seat3"> Seat 3<br> 
+      <input type="radio" name="seat" value="4" id="seat4"> Seat 4<br>
+      <button>Take seat</button> 
+    </form>
     <p>Stack : <span id="stack"></span></p>
-    <form action="">
+    <form id="bet" action="">
       <input type="range" min="1" max="100" value="50" class="slider" id="m">
       <button>Send</button>
     </form>

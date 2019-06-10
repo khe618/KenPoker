@@ -18,10 +18,59 @@ app.use(bodyParser.json());
 app.use(express.static('public'));
 
 var port = process.env.PORT || 3000;
+var connectedUsers = {}
+var deck = []
+for (var i = 0; i < 52; i++){
+	deck[i] = i
+}
+shuffleArray(deck)
 
 /*app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });*/
+
+function shuffleArray(array) {
+	for (var i = array.length - 1; i > 0; i--) {
+    	var j = Math.floor(Math.random() * (i + 1));
+    	var temp = array[i];
+    	array[i] = array[j];
+    	array[j] = temp;
+  	}
+}
+
+function numToCard(n){
+	suits = ['s', 'd', 'h', 'c']
+	ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+	return ranks[n%13] + suits[Math.floor(n/13)]
+}
+
+//players is an array of userids
+function dealCards(players){
+	shuffleArray(deck)
+	var i = 0;
+	var result = [];
+	var cards;
+ 	for (var player of players){
+ 		cards = numToCard(deck[i]) + numToCard(deck[i+1]);
+		result.push({uid:player, cards:cards});
+		i += 2;
+		connectedUsers[player].emit('cards', cards)
+	}
+	db.collection("cards").update({}, {players:result}, function(err, result){
+		if (err) throw err;
+	})
+
+}
+
+function getPlayers(seats){
+	var playerIds = []
+	for (var i = 1; i <= 4; i++){
+		if (seats[i] != null){
+			playerIds.push(i)
+		}
+	}
+	return playerIds;
+}
 
 app.get("/login", function(req, res){
 	res.sendFile("login.html", {root: __dirname + "/public/"})
@@ -37,6 +86,15 @@ app.get('/messages', function(req, res){
 })
 
 io.on('connection', function(socket){
+  //console.log(socket)
+  socket.on('login', function(uid){
+  	connectedUsers[uid] = socket
+  	db.collection("gameState").findOne({}, function(err, result){
+  		if (err) throw err;
+  		socket.emit('game state', result)
+  	})
+  })
+
   socket.on('chat message', function(msg){
     //io.emit('chat message', msg);
     var obj = {"text":msg}
@@ -45,6 +103,49 @@ io.on('connection', function(socket){
 
     })
   });
+  socket.on('take seat', function(data){
+  	var seat = data.seat
+  	var uid = data.uid
+  	db.collection("gameState").findOne({}, function(err, result){
+  		if (err) throw err;
+  		var seats = result.seats
+  		var isValid = true
+  		/*for (var player of players){
+  			if (player.uid == uid || player.seat == seat){
+  				isValid = false
+  			}
+  		}*/
+  		if (seats[seat] !== null){
+  			isValid = false
+  		}
+  		var playerIds = getPlayers(seats)
+  		for (var playerId of playerIds){
+  			if (seats[playerId].uid == uid){
+  				isValid = false
+  			}
+  		}
+  		if (isValid){
+  			seats[seat] = {uid:uid, stackSize:100, folded:true, amountBet:0}
+  			if (playerIds.length == 2){
+  				//start game
+  				for (var playerId of playerIds){
+  					seats[playerId].folded = false
+  				}
+  				dealCards(playerIds)
+  				result.button = playerIds[0]
+  				result.turn = button;
+  				seats[playerIds[0]].amountBet = 1
+  				seats[playerIds[1]].amountBet = 2
+  				result.bet = 2;
+  				result.lastBet = playerIds[1]
+  			}
+  			db.collection('gameState').update({}, result, function(err, result2){
+  				if (err) throw err;
+  			})
+  			io.emit('game state', result)
+  		}
+  	})
+  })
 });
 
 http.listen(port, function(){

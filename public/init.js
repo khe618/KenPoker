@@ -1,11 +1,12 @@
 var app = angular.module('blogApp', ["firebase"]);
+var uid;
 app.controller("MyAuthCtrl", ["$scope", "$rootScope", "$http", "$firebaseAuth",
   function($scope, $rootScope, $http, $firebaseAuth) {
     $scope.authObj = $firebaseAuth();
   $scope.authObj.$onAuthStateChanged(function(firebaseUser) {
       if (firebaseUser) {
           console.log("Signed in as:", firebaseUser.uid);
-      
+          uid = firebaseUser.uid
       } else {
           console.log("Signed out");
       }
