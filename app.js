@@ -53,8 +53,10 @@ function dealCards(players){
  	for (var player of players){
  		cards = numToCard(deck[i]) + numToCard(deck[i+1]);
 		result.push({uid:player, cards:cards});
-		i += 2;
-		connectedUsers[player].emit('cards', cards)
+		i += 2
+		if (connectedUsers[player]){
+			connectedUsers[player].emit('cards', cards)
+		}
 	}
 	db.collection("cards").update({}, {players:result}, function(err, result){
 		if (err) throw err;
@@ -92,6 +94,13 @@ io.on('connection', function(socket){
   	db.collection("gameState").findOne({}, function(err, result){
   		if (err) throw err;
   		socket.emit('game state', result)
+  	})
+  	db.collection("cards").findOne({}, function(err, result){
+  		for (var player of result.players){
+  			if (player.uid == uid){
+  				socket.emit('cards', player.cards)
+  			}
+  		}
   	})
   })
 
