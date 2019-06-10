@@ -118,14 +118,15 @@ io.on('connection', function(socket){
   		if (seats[seat] !== null){
   			isValid = false
   		}
-  		var playerIds = getPlayers(seats)
-  		for (var playerId of playerIds){
-  			if (seats[playerId].uid == uid){
-  				isValid = false
-  			}
-  		}
+  		
   		if (isValid){
   			seats[seat] = {uid:uid, stackSize:100, folded:true, amountBet:0}
+  			var playerIds = getPlayers(seats)
+  			for (var playerId of playerIds){
+  				if (seats[playerId].uid == uid){
+  					isValid = false
+  				}
+  			}
   			if (playerIds.length == 2){
   				//start game
   				for (var playerId of playerIds){

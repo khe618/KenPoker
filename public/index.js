@@ -65,6 +65,9 @@ $(function () {
   });*/
   socket.on('cards', function(cards){
     console.log(cards)
+    var cardElem = document.getElementById('cards')
+    cardElem.style.display = 'block'
+    cardElem.innerHTML = 'Cards: ' + cards
   })
   socket.on('game state', function(state){
     var found = false
