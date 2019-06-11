@@ -278,10 +278,10 @@ function newGame(result){
 	result.button = findNextPlayer(result, result.button)
 	if (seatNums.length == 2){
 		result.lastBet = findNextPlayer(result, result.button) //big blind
-		result.seats[button].amountBet = 1;
-		result.seats[button].stackSize -= 1;
-		result.seats[lastBet].amountBet = 2;
-		result.seats[lastBet].stackSize -= 2;
+		result.seats[result.button].amountBet = 1;
+		result.seats[result.button].stackSize -= 1;
+		result.seats[result.lastBet].amountBet = 2;
+		result.seats[result.lastBet].stackSize -= 2;
 	}
 	else{
 		var smallBlind = findNextPlayer(result, result.button);
