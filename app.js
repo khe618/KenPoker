@@ -298,7 +298,7 @@ function newGame(result){
   		playerIds.push(seats[seatNum].uid)
   	}
   	result.community = []
-  	result.pot = 0;
+  	result.pot = 3;
   	result.street = "preflop"
   	dealCards(playerIds)
   	db.collection("gameState").update({}, result, function(err, result2){
