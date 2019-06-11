@@ -155,6 +155,7 @@ function nextStreet(result){
 	}
 	else{
 		db.collection("cards").find({}, function(err, result2){
+			console.log(result2)
 			if (err) throw err;
 			if (street == 'preflop'){
 				result.street = 'flop'
@@ -294,7 +295,9 @@ io.on('connection', function(socket){
   				result.button = seatNums[0]
   				result.turn = seatNums[0];
   				seats[seatNums[0]].amountBet = 1
+  				seats[seatNums[0]].stackSize -= 1
   				seats[seatNums[1]].amountBet = 2
+  				seats[seatNums[1]].stackSize -= 2
   				result.bet = 2;
   				result.lastBet = seatNums[1]
   				result.pot = 3;
