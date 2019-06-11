@@ -283,10 +283,12 @@ function newGame(result){
 		seats[result.button].stackSize -= 1;
 		seats[result.lastBet].amountBet = 2;
 		seats[result.lastBet].stackSize -= 2;
+		result.turn = button
 	}
 	else{
 		var smallBlind = findNextPlayer(result, result.button);
 		var bigBlind = findNextPlayer(result, smallBlind)
+		result.turn = findNextPlayer(result, bigBlind)
 		seats[smallBlind].amountBet = 1
 		seats[smallBlind].stackSize -= 1;
 		seats[bigBlind].amountBet = 2
