@@ -323,7 +323,7 @@ function nextStreet(result){
 					result.seats[winner].stackSize += Math.floor(result.pot / winners.length)
 				}*/
 				for (var i = 1; i<= 4; i++){
-					if (result.seats[i].uid !== null && winners.includes(result.seats[i].uid)){
+					if (result.seats[i] !== null && winners.includes(result.seats[i].uid)){
 						result.seats[i].stackSize += Math.floor(result.pot / winners.length)
 					}
 				}
