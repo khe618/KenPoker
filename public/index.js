@@ -83,7 +83,6 @@ $(function () {
     window.scrollTo(0, document.body.scrollHeight);
   });*/
   socket.on('cards', function(cards){
-    console.log(cards)
     var cardElem = document.getElementById('cards')
     cardElem.style.display = 'block'
     cardElem.innerHTML = 'Cards: ' + cards[0] + cards[1]
@@ -107,17 +106,19 @@ $(function () {
         }
         document.getElementById("seat" + i + "info").innerHTML = 
         "id: " + player.uid + " Stack: " + player.stackSize + " Amount Bet: " + player.amountBet + " Folded: " + player.folded
-        document.getElementById("pot").innerHTML = state.pot
-        document.getElementById("community").innerHTML = ""
-        for (var i = 0; i < state.community.length; i++){
-          document.getElementById("community").innerHTML += state.community[i] + " " 
-        }
+        
       }
       else{
         openSeats.push(i)
       }
-
       
+    }
+    document.getElementById("pot").innerHTML = state.pot
+    document.getElementById("community").innerHTML = ""
+    if (state.community){
+      for (var j = 0; j < state.community.length; j++){
+        document.getElementById("community").innerHTML += state.community[i] + " " 
+      }
     }
     for (var i = 1; i <= 4; i++){
       document.getElementById("seat" + i).style.display = "none"
