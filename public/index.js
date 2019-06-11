@@ -103,9 +103,15 @@ $(function () {
           slider.max = stackSize;
           slider.min = state.bet
           slider.value = state.bet
+          output.innerHTML = state.bet
         }
         document.getElementById("seat" + i + "info").innerHTML = 
         "id: " + player.uid + " Stack: " + player.stackSize + " Amount Bet: " + player.amountBet + " Folded: " + player.folded
+        document.getElementById("pot").innerHTML = state.pot
+        document.getElementById("community").innerHTML = ""
+        for (var i = 0; i < state.community.length; i++){
+          document.getElementById("community").innerHTML += state.community[i] + " " 
+        }
       }
       else{
         openSeats.push(i)
