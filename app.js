@@ -284,7 +284,7 @@ io.on('connection', function(socket){
   		
   		if (isValid){
   			seats[seat] = {uid:uid, stackSize:100, folded:true, amountBet:0}
-  			
+  			seatNums.append(seat)
   			if (seatNums.length == 2){
   				//start game
   				for (var seatNum of seatNums){
