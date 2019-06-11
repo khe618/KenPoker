@@ -183,6 +183,16 @@ function myBestHand(cards){
 	return [bestHand, bestRanking]
 }
 
+isFolded(result, uid){
+	var seats = result.seats
+	for (var i = 0; i < seats.length; i++){
+		if (seats[i] !== null && seats[i].uid === uid){
+			return seats[i].folded
+		}
+	}
+	return true
+}
+
 function determineWinners(result, cards){
 	var community = result.community
 	var winners = [cards.players[0].uid]
@@ -190,14 +200,16 @@ function determineWinners(result, cards){
 	var nextRanking;
 	var comparison;
 	for (var i = 1; i < cards.players.length; i++){
-		nextRanking = myBestHand(community.concat(cards.players[i].cards))[1]
-		comparison = compareHands(nextRanking, bestRanking)
-		if (comparison > 0){
-			bestRanking = nextRanking
-			winners = [cards.players[i].uid]
-		}
-		else if (comparison === 0){
-			winners.push(cards.players[i].uid)
+		if (!isFolded(result, cards.players[i].uid)){
+			nextRanking = myBestHand(community.concat(cards.players[i].cards))[1]
+			comparison = compareHands(nextRanking, bestRanking)
+			if (comparison > 0){
+				bestRanking = nextRanking
+				winners = [cards.players[i].uid]
+			}
+			else if (comparison === 0){
+				winners.push(cards.players[i].uid)
+			}
 		}
 	}
 	return winners;
@@ -311,7 +323,7 @@ function nextStreet(result){
 					result.seats[winner].stackSize += Math.floor(result.pot / winners.length)
 				}*/
 				for (var i = 1; i<= 4; i++){
-					if (winners.includes(result.seats[i].uid)){
+					if (result.seats[i].uid !== null && winners.includes(result.seats[i].uid)){
 						result.seats[i].stackSize += Math.floor(result.pot / winners.length)
 					}
 				}
