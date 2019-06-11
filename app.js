@@ -140,6 +140,10 @@ function newGame(result){
   	result.river = null
   	result.pot = 0;
   	dealCards(playerIds)
+  	db.collection("gameState").update({}, result, function(err, result2){
+  		if (err) throw err;
+  		io.emit("game state", result)
+  	})
 }
 
 function nextStreet(result){
@@ -157,10 +161,6 @@ function nextStreet(result){
 			result.seats[winner].stackSize += Math.floor(result.pot / winners.length)
 			newGame(result)
 		}
-		db.collection("gameState").update({}, result, function(err, result2){
-  			if (err) throw err;
-  			io.emit("game state", result)
-  		})
 	}
 	else{
 		db.collection("cards").findOne({}, function(err, result2){
@@ -247,17 +247,15 @@ io.on('connection', function(socket){
   			}
   			else{
   				result.turn = findNextPlayer(result, result.turn)
-  				if (result.turn == result.lastBet){
+  				if (result.turn == result.lastBet && !(result.bet == 2 && result.street == 'preflop')){
   					//give BB option to check
-  					if (!(result.bet == 2 && result.street == 'preflop')){
-  						nextStreet(result)
-  					}
-  					else{
-  						db.collection("gameState").update({}, result, function(err, result2){
-  							if (err) throw err;
-  							io.emit("game state", result)
-  						})
-  					}
+  					nextStreet(result)
+  				}
+  				else{
+  					db.collection("gameState").update({}, result, function(err, result2){
+  						if (err) throw err;
+  						io.emit("game state", result)
+  					})
   				}
   			}
   			
