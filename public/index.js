@@ -119,7 +119,7 @@ $(function () {
     }
     else{
       for (var i = 1; i <= 4; i++){
-        document.getElementById("seat" + seat).style.display = "none"
+        document.getElementById("seat" + i).style.display = "none"
       }
     }
     if (state.button){
