@@ -275,7 +275,7 @@ function newGame(result){
 		seats[seatNum].amountBet = 0;
 		seats[seatNum].folded = false;
 	}
-	result.bet = 0;
+	result.bet = 2;
 	result.button = findNextPlayer(result, result.button)
 	if (seatNums.length == 2){
 		result.lastBet = findNextPlayer(result, result.button) //big blind
