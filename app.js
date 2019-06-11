@@ -409,15 +409,16 @@ io.on('connection', function(socket){
   			result.pot += bet - seats[turn].amountBet;
   			seats[turn].amountBet = bet 
   			//find next turn
-  			//special case of when BB checks preflop
-  			if (result.bet == 2 && result.street == 'preflop'){
+  			//option of checking
+  			if ((result.bet === 2 && result.street == 'preflop') || (result.bet === 0 && result.turn === result.button) ){
   				nextStreet(result)
   			}
   			else{
   				result.turn = findNextPlayer(result, result.turn)
   				console.log(result.turn)
-  				if (result.turn == result.lastBet && !(result.bet == 2 && result.street == 'preflop')){
-  					//give BB option to check
+  				if (result.turn === result.lastBet && !((result.bet === 2 && result.street == 'preflop') || 
+  					(result.bet === 0 && result.turn === result.button))){
+  					//option of checking
   					nextStreet(result)
   				}
   				else{
