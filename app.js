@@ -154,7 +154,7 @@ function nextStreet(result){
 		}
 	}
 	else{
-		db.collection("cards").find({}, function(err, result2){
+		db.collection("cards").findOne({}, function(err, result2){
 			console.log(result2)
 			if (err) throw err;
 			if (street == 'preflop'){
