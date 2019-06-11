@@ -247,6 +247,7 @@ io.on('connection', function(socket){
   			}
   			else{
   				result.turn = findNextPlayer(result, result.turn)
+  				console.log(result.turn)
   				if (result.turn == result.lastBet && !(result.bet == 2 && result.street == 'preflop')){
   					//give BB option to check
   					nextStreet(result)
