@@ -59,7 +59,7 @@ $(function () {
   $('#bet').submit(function(){
     var bet = parseInt($('#m').val())
     if (bet <= stackSize){
-      socket.emit('bet', $('#m').val());
+      socket.emit('bet', bet);
       /*$('#m').val(1);
       output.innerHTML = 1;
       stackSize -= bet
