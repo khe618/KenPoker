@@ -299,6 +299,7 @@ function newGame(result){
   	}
   	result.community = []
   	result.pot = 0;
+  	result.street = "preflop"
   	dealCards(playerIds)
   	db.collection("gameState").update({}, result, function(err, result2){
   		if (err) throw err;
