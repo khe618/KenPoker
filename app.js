@@ -118,13 +118,17 @@ function newGame(result){
 	if (seatNums.length == 2){
 		result.lastBet = findNextPlayer(result, result.button) //big blind
 		result.seats[button].amountBet = 1;
+		result.seats[button].stackSize -= 1;
 		result.seats[lastBet].amountBet = 2;
+		result.seats[lastBet].stackSize -= 2;
 	}
 	else{
 		var smallBlind = findNextPlayer(result, result.button);
 		var bigBlind = findNextPlayer(result, smallBlind)
 		result.seats[smallBlind].amountBet = 1
+		result.seats[smallBlind].stackSize -= 1;
 		result.seats[bigBlind].amountBet = 2
+		result.seats[bigBlind].stackSize -= 1;
 		result.lastBet = bigBlind
 	}
 	var playerIds =[]
@@ -134,6 +138,7 @@ function newGame(result){
   	result.flop = null
   	result.turnCard = null
   	result.river = null
+  	result.pot = 0;
   	dealCards(playerIds)
 }
 
@@ -152,6 +157,10 @@ function nextStreet(result){
 			result.seats[winner].stackSize += Math.floor(result.pot / winners.length)
 			newGame(result)
 		}
+		db.collection("gameState").update({}, result, function(err, result2){
+  			if (err) throw err;
+  			io.emit("game state", result)
+  		})
 	}
 	else{
 		db.collection("cards").findOne({}, function(err, result2){
@@ -178,6 +187,10 @@ function nextStreet(result){
 			result.bet = 0;
 			result.lastBet = result.button;
 			result.turn = findNextPlayer(result, result.button)
+			db.collection("gameState").update({}, result, function(err, result2){
+  				if (err) throw err;
+  				io.emit("game state", result)
+  			})
 		})
 		
 	}
@@ -239,12 +252,15 @@ io.on('connection', function(socket){
   					if (!(result.bet == 2 && result.street == 'preflop')){
   						nextStreet(result)
   					}
+  					else{
+  						db.collection("gameState").update({}, result, function(err, result2){
+  							if (err) throw err;
+  							io.emit("game state", result)
+  						})
+  					}
   				}
   			}
-  			db.collection("gameState").update({}, result, function(err, result2){
-  				if (err) throw err;
-  				io.emit("game state", result)
-  			})
+  			
   	    }
   	})
   })
