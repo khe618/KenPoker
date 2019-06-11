@@ -232,22 +232,17 @@ io.on('connection', function(socket){
   			nextStreet(result)
   		}
   		else{
-  			turn += 1;
-  			turn = turn % 4;
-  			var seatNums = getSeatNums(seats)
-  			while (!seatNums.includes(turn) || seats[turn].folded){
-  				turn += 1;
-  				turn = turn % 4;
-  			}
-  			if (turn == result.lastBet){
+  			result.turn = findNextPlayer(result, result.turn)
+  			if (result.turn == result.lastBet){
   				//give BB option to check
   				if (!(result.bet == 2 && result.street == 'preflop')){
   					nextStreet(result)
   				}
   			}
   		}
-  		db.collection("gameState").update({}, result, function(err, result){
+  		db.collection("gameState").update({}, result, function(err, result2){
   			if (err) throw err;
+  			io.emit("game state", result)
   		})
   	})
   })

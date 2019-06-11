@@ -125,6 +125,9 @@ $(function () {
     }
     if (state.turn){
       document.getElementById("seat" + state.turn + "info").innerHTML += " (action) "
+      if (state.seats[state.turn].uid == uid){
+        document.getElementById("betSpan").style.display = "block"
+      }
     }
 
   })
