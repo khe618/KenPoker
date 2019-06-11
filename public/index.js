@@ -115,9 +115,10 @@ $(function () {
     }
     document.getElementById("pot").innerHTML = state.pot
     document.getElementById("community").innerHTML = ""
+    console.log(state.community)
     if (state.community){
       for (var j = 0; j < state.community.length; j++){
-        document.getElementById("community").innerHTML += state.community[i] + " " 
+        document.getElementById("community").innerHTML += state.community[j] + " " 
       }
     }
     for (var i = 1; i <= 4; i++){
