@@ -58,6 +58,8 @@ $(function () {
   }
   $('#bet').submit(function(){
     var bet = $('#m').val()
+    console.log(typeof(stackSize))
+    console.log(typeof(bet))
     if (bet <= stackSize){
       socket.emit('bet', $('#m').val());
       /*$('#m').val(1);
