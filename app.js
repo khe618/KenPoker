@@ -24,7 +24,8 @@ for (var i = 0; i < 52; i++){
 	deck[i] = i
 }
 shuffleArray(deck)
-
+var suits = ['s', 'd', 'h', 'c']
+var ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 /*app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });*/
@@ -39,9 +40,167 @@ function shuffleArray(array) {
 }
 
 function numToCard(n){
-	suits = ['s', 'd', 'h', 'c']
-	ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 	return ranks[n%13] + suits[Math.floor(n/13)]
+}
+
+function determineHand(hand){
+	//high card: 0, pair: 1, 2 pair: 2, three of a kind: 3, straight: 4, flush: 5,
+	//full house: 6, quads: 7, straight flush: 8
+	var myRanks = hand.map(x =>ranks.indexOf(x.slice(0, x.length-1)));
+	myRanks.sort(function(a, b){return b-a})
+	var mySuits = hand.map(x => x[x.length-1])
+	var isFlush = mySuits[0] === mySuits[1] &&
+		  		  mySuits[1] === mySuits[2] &&
+		  		  mySuits[2] === mySuits[3] &&
+		  		  mySuits[3] === mySuits[4]
+	var isStraight = (myRanks[0] === myRanks[1] + 1 &&
+		myRanks[1] === myRanks[2] + 1 &&
+		myRanks[2] === myRanks[3] + 1 &&
+		myRanks[3] === myRanks[4] + 1) || 
+		(myRanks[0] === 12 && 
+		 myRanks[1] === 3 && 
+		 myRanks[2] === 2 && 
+		 myRanks[3] === 1 && 
+		 myRanks[4] === 0)
+	var counts = Array(13).fill(0)
+	for (var rank of myRanks){
+		counts[rank] += 1
+	}
+	var maxCount = Math.max(...counts)
+	if (isFlush && isStraight){
+		return [8, myRanks[0]]
+	}
+
+	if (maxCount === 4){
+		return [7, counts.indexOf(4), counts.indexOf(1)]
+	}
+	if (maxCount === 3 && counts.includes(2)){
+		return [6, counts.indexOf(3), counts.indexOf(2)]
+	}
+	if (isFlush){
+		return [5, myRanks]
+	}
+	if (isStraight){
+		return [4, myRanks[0]]
+	}
+	if (maxCount === 3){
+		return [3, counts.indexOf(3), counts.lastIndexOf(1), counts.indexOf(1)]
+	}
+	if (maxCount === 2){
+		var higherPair = counts.lastIndexOf(2)
+		var lowerPair = counts.indexOf(2)
+		if (higherPair !== lowerPair){
+			return [2, higherPair, lowerPair, counts.indexOf(1)]
+		}
+		return [1, higherPair, myRanks]
+	}
+	return [0, myRanks]
+}
+
+function compareHands(ranking1, ranking2){
+	if (ranking1[0] !== ranking2[0]){
+		return ranking1[0] - ranking2[0]
+	}
+	var handType = ranking1[0]
+	if (handType === 8 || handType === 4){
+		return ranking1[1] - ranking2[1]
+	}
+	if (handType === 7 || handType === 6 ){
+		if (ranking1[1] !== ranking2[1]){
+			return ranking1[1] - ranking2[1]
+		}
+		return ranking1[2] - ranking2[2]
+	}
+	if (handType === 5 || handType === 0){
+		for (var i = 0; i < 5; i++){
+			if (ranking1[1][i] !== ranking2[1][i]){
+				return ranking1[1][i] - ranking2[1][i]
+			}
+		}
+		return 0;
+	}
+	if (handType === 3 || handType === 2){
+		if (ranking1[1] !== ranking2[1]){
+			return ranking1[1] - ranking2[1]
+		}
+		if (ranking1[2] !== ranking2[2]){
+			return ranking1[2] - ranking2[2]
+		}
+		return ranking1[3]
+	}
+	if (handType === 1){
+		if (ranking1[1] !== ranking2[1]){
+			return ranking1[1] - ranking2[1]
+		}
+		for (var i = 0; i < 5; i++){
+			if (ranking1[2][i] !== ranking2[2][i]){
+				return ranking1[2][i] - ranking2[2][i]
+			}
+		}
+		return 0
+	}
+}
+function subset(arra, arra_size)
+ {
+    var result_set = [], 
+        result;
+    
+   
+for(var x = 0; x < Math.pow(2, arra.length); x++)
+  {
+    result = [];
+    i = arra.length - 1; 
+     do
+      {
+      if( (x & (1 << i)) !== 0)
+          {
+             result.push(arra[i]);
+           }
+        }  while(i--);
+
+    if( result.length === arra_size)
+       {
+          result_set.push(result);
+        }
+    }
+
+    return result_set; 
+}
+
+function myBestHand(cards){
+	var possibleHands = subset(cards, 5)
+	var bestHand = possibleHands[0]
+	console.log(bestHand)
+	var bestRanking = determineHand(bestHand)
+	var nextRanking;
+	for (var i = 1; i < 21; i++){
+		nextRanking = determineHand(possibleHands[i])
+		if (compareHands(nextRanking, bestRanking) > 0){
+			bestRanking = nextRanking
+			bestHand = possibleHands[i]
+		}
+	}
+	return [bestHand, bestRanking]
+}
+
+function determineWinners(result, cards){
+	var community = result.community
+	var winners = [cards.players[0].uid]
+	var bestRanking = myBestHand(community.concat(cards.players[0].cards))[1]
+	var nextRanking;
+	var comparison;
+	for (var i = 1; i < cards.players.length; i++){
+		nextRanking = myBestHand(community.concat(cards.players[i].cards))[1]
+		comparison = compareHands(nextRanking, bestRanking)
+		if (comparison > 0){
+			bestRanking = nextRanking
+			winners = [cards.players[i].uid]
+		}
+		else if (comparison === 0){
+			winners.push(cards.players[i].uid)
+		}
+	}
+	return winners;
 }
 
 //players is an array of userids
@@ -51,17 +210,15 @@ function dealCards(players){
 	var result = [];
 	var cards;
  	for (var player of players){
- 		cards = numToCard(deck[i]) + numToCard(deck[i+1]);
+ 		cards = [numToCard(deck[i]), numToCard(deck[i+1])];
 		result.push({uid:player, cards:cards});
 		i += 2
 		if (connectedUsers[player]){
 			connectedUsers[player].emit('cards', cards)
 		}
-		var flop = [numToCard(deck[i]), numToCard(deck[i+1]), numToCard(deck[i+2])]
-		var turn = numToCard(deck[i+3])
-		var river = numToCard(deck[i+4])
+		var community = [numToCard(deck[i]), numToCard(deck[i+1]), numToCard(deck[i+2]), numToCard(deck[i+3]), numToCard(deck[i+4])]
 	}
-	db.collection("cards").update({}, {players:result, flop:flop, turn:turn, river:river}, function(err, result){
+	db.collection("cards").update({}, {players:result, community:community}, function(err, result){
 		if (err) throw err;
 	})
 
@@ -98,14 +255,6 @@ function findNextPlayer(result, i){
 	return temp;
 }
 
-function determineWinner(result){
-	for (var i = 1; i <= 4; i++){
-		if (result.seats[i] !== null && !result.seats[i].folded){
-			return i
-		}
-	}
-	return -1
-}
 
 function newGame(result){
 	var seatNums = getSeatNums(result.seats)
@@ -135,9 +284,7 @@ function newGame(result){
   	for (seatNum of seatNums){
   		playerIds.push(seats[seatNum].uid)
   	}
-  	result.flop = null
-  	result.turnCard = null
-  	result.river = null
+  	result.community = []
   	result.pot = 0;
   	dealCards(playerIds)
   	db.collection("gameState").update({}, result, function(err, result2){
@@ -155,28 +302,35 @@ function nextStreet(result){
 		newGame(result)
 		return;
 	}
-	if (street == 'river'){
-		winners = determineWinner(result)
-		for (var winner of winners){
-			result.seats[winner].stackSize += Math.floor(result.pot / winners.length)
-			newGame(result)
-		}
-	}
 	else{
 		db.collection("cards").findOne({}, function(err, result2){
-			console.log(result2)
 			if (err) throw err;
+			if (street == 'river'){
+				winners = determineWinners(result, result2)
+				/*for (var winner of winners){
+					result.seats[winner].stackSize += Math.floor(result.pot / winners.length)
+				}*/
+				for (var i = 1; i<= 4; i++){
+					if (winners.includes(result.seats[i].uid)){
+						result.seats[i].stackSize += Math.floor(result.pot / winners.length)
+					}
+				}
+				newGame(result)
+				return;
+			}
 			if (street == 'preflop'){
 				result.street = 'flop'
-				result.flop = result2.flop
+				result.community[0] = result2.community[0]
+				result.community[1] = result2.community[1]
+				result.community[2] = result2.community[2]
 			}
 			else if (street == 'flop'){
 				result.street = 'turn'
-				result.turnCard = result2.turn
+				result.community[3] = result2.community[3]
 			}
 			else if (street == 'turn'){
 				result.street = 'river';
-				result.river = result2.river
+				result.community[4] = result2.community[4]
 			}
 			//var seatNums = getSeatNums(result.seats)
 			for (var i = 1; i <= 4; i++){
@@ -295,7 +449,7 @@ io.on('connection', function(socket){
   		}
   		
   		if (isValid){
-  			seats[seat] = {uid:uid, stackSize:100, folded:true, amountBet:0}
+  			seats[seat] = {uid:uid, stackSize:200, folded:true, amountBet:0}
   			seatNums.push(seat)
   			if (seatNums.length == 2){
   				//start game
@@ -317,9 +471,7 @@ io.on('connection', function(socket){
   				result.lastBet = seatNums[1]
   				result.pot = 3;
   				result.street = "preflop"
-  				result.flop = null
-  				result.turnCard = null
-  				result.river = null
+  				result.community = []
   			}
   			db.collection('gameState').update({}, result, function(err, result2){
   				if (err) throw err;

@@ -86,7 +86,7 @@ $(function () {
     console.log(cards)
     var cardElem = document.getElementById('cards')
     cardElem.style.display = 'block'
-    cardElem.innerHTML = 'Cards: ' + cards
+    cardElem.innerHTML = 'Cards: ' + cards[0] + cards[1]
   })
   socket.on('game state', function(state){
     var found = false;
@@ -102,6 +102,7 @@ $(function () {
           stack.innerHTML = stackSize
           slider.max = stackSize;
           slider.min = state.bet
+          slider.value = state.bet
         }
         document.getElementById("seat" + i + "info").innerHTML = 
         "id: " + player.uid + " Stack: " + player.stackSize + " Amount Bet: " + player.amountBet + " Folded: " + player.folded
