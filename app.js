@@ -218,32 +218,33 @@ io.on('connection', function(socket){
   		var turn = result.turn;
   		var currentBet = result.bet
   		if (seats[turn].stackSize >= bet && bet >= result.bet){
+  			seats[turn].stackSize -= bet - seats[turn].amountBet
   			//raise
   			if (bet > result.bet){
   				result.bet = bet
   				result.lastBet = turn
   			}
-  		}
-  		result.pot += bet - seats[turn].amountBet;
-  		seats[turn].amountBet = bet 
-  		//find next turn
-  		//special case of when BB checks preflop
-  		if (result.bet == 2 && result.street == 'preflop'){
-  			nextStreet(result)
-  		}
-  		else{
-  			result.turn = findNextPlayer(result, result.turn)
-  			if (result.turn == result.lastBet){
-  				//give BB option to check
-  				if (!(result.bet == 2 && result.street == 'preflop')){
-  					nextStreet(result)
+  			result.pot += bet - seats[turn].amountBet;
+  			seats[turn].amountBet = bet 
+  			//find next turn
+  			//special case of when BB checks preflop
+  			if (result.bet == 2 && result.street == 'preflop'){
+  				nextStreet(result)
+  			}
+  			else{
+  				result.turn = findNextPlayer(result, result.turn)
+  				if (result.turn == result.lastBet){
+  					//give BB option to check
+  					if (!(result.bet == 2 && result.street == 'preflop')){
+  						nextStreet(result)
+  					}
   				}
   			}
-  		}
-  		db.collection("gameState").update({}, result, function(err, result2){
-  			if (err) throw err;
-  			io.emit("game state", result)
-  		})
+  			db.collection("gameState").update({}, result, function(err, result2){
+  				if (err) throw err;
+  				io.emit("game state", result)
+  			})
+  	    }
   	})
   })
   socket.on('chat message', function(msg){

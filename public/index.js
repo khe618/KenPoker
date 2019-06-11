@@ -123,6 +123,7 @@ $(function () {
     if (state.button){
       document.getElementById("seat" + state.button + "info").innerHTML += " (button) "
     }
+    document.getElementById("betSpan").style.display = "none"
     if (state.turn){
       document.getElementById("seat" + state.turn + "info").innerHTML += " (action) "
       if (state.seats[state.turn].uid == uid){
