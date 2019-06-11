@@ -183,7 +183,7 @@ function myBestHand(cards){
 	return [bestHand, bestRanking]
 }
 
-isFolded(result, uid){
+function isFolded(result, uid){
 	var seats = result.seats
 	for (var i = 0; i < seats.length; i++){
 		if (seats[i] !== null && seats[i].uid === uid){
