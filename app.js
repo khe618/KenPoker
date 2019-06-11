@@ -269,27 +269,28 @@ function findNextPlayer(result, i){
 
 
 function newGame(result){
-	var seatNums = getSeatNums(result.seats)
+	var seats = result.seats
+	var seatNums = getSeatNums(seats)
 	for (var seatNum of seatNums){
-		result.seats[seatNum].amountBet = 0;
-		result.seats[seatNum].folded = false;
+		seats[seatNum].amountBet = 0;
+		seats[seatNum].folded = false;
 	}
 	result.bet = 0;
 	result.button = findNextPlayer(result, result.button)
 	if (seatNums.length == 2){
 		result.lastBet = findNextPlayer(result, result.button) //big blind
-		result.seats[result.button].amountBet = 1;
-		result.seats[result.button].stackSize -= 1;
-		result.seats[result.lastBet].amountBet = 2;
-		result.seats[result.lastBet].stackSize -= 2;
+		seats[result.button].amountBet = 1;
+		seats[result.button].stackSize -= 1;
+		seats[result.lastBet].amountBet = 2;
+		seats[result.lastBet].stackSize -= 2;
 	}
 	else{
 		var smallBlind = findNextPlayer(result, result.button);
 		var bigBlind = findNextPlayer(result, smallBlind)
-		result.seats[smallBlind].amountBet = 1
-		result.seats[smallBlind].stackSize -= 1;
-		result.seats[bigBlind].amountBet = 2
-		result.seats[bigBlind].stackSize -= 1;
+		seats[smallBlind].amountBet = 1
+		seats[smallBlind].stackSize -= 1;
+		seats[bigBlind].amountBet = 2
+		seats[bigBlind].stackSize -= 1;
 		result.lastBet = bigBlind
 	}
 	var playerIds =[]
