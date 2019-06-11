@@ -57,9 +57,7 @@ $(function () {
     socket.emit('take seat', {uid:uid, seat:4})
   }
   $('#bet').submit(function(){
-    var bet = $('#m').val()
-    console.log(typeof(stackSize))
-    console.log(typeof(bet))
+    var bet = parseInt($('#m').val())
     if (bet <= stackSize){
       socket.emit('bet', $('#m').val());
       /*$('#m').val(1);
