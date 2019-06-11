@@ -112,14 +112,12 @@ $(function () {
 
       
     }
+    for (var i = 1; i <= 4; i++){
+      document.getElementById("seat" + i).style.display = "none"
+    }
     if (!found){
       for (var seat of openSeats){
         document.getElementById("seat" + seat).style.display = "block"
-      }
-    }
-    else{
-      for (var i = 1; i <= 4; i++){
-        document.getElementById("seat" + i).style.display = "none"
       }
     }
     if (state.button){
