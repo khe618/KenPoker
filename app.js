@@ -283,7 +283,7 @@ function newGame(result){
 		seats[result.button].stackSize -= 1;
 		seats[result.lastBet].amountBet = 2;
 		seats[result.lastBet].stackSize -= 2;
-		result.turn = button
+		result.turn = result.button
 	}
 	else{
 		var smallBlind = findNextPlayer(result, result.button);
