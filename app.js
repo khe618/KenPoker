@@ -412,7 +412,7 @@ io.on('connection', function(socket){
   			seats[turn].amountBet = bet 
   			//find next turn
   			//option of checking
-  			if ((result.bet === 2 && result.street == 'preflop') || (result.bet === 0 && result.turn === result.button) ){
+  			if ((result.bet === 2 && result.turn === result.lastBet && result.street == 'preflop') || (result.bet === 0 && result.turn === result.button) ){
   				nextStreet(result)
   			}
   			else{
