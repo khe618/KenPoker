@@ -395,6 +395,39 @@ io.on('connection', function(socket){
   		}
   	})
   })
+
+
+  function handleNextAction(result){
+  	if ((result.bet === 2 && result.turn === result.lastBet && result.street == 'preflop') || (result.bet === 0 && result.turn === result.button) ){
+  		nextStreet(result)
+  	}
+  	else{
+  		result.turn = findNextPlayer(result, result.turn)
+  		console.log(result.turn)
+  		if (result.turn === result.lastBet && !((result.bet === 2 && result.street == 'preflop') || 
+  			(result.bet === 0 && result.turn === result.button))){
+  			//option of checking
+  			nextStreet(result)
+  		}
+  		else{
+  			db.collection("gameState").update({}, result, function(err, result2){
+  				if (err) throw err;
+  				io.emit("game state", result)
+  			})
+  		}
+  	}
+  }
+
+  socket.on('fold', function(){
+  	db.collection("gameState").findOne({}, function(err, result){
+  		if (err) throw err;
+  		var turn = result.turn
+  		var seats = result.seats
+  		seats[turn].folded = true
+  		handleNextAction(result)
+  	})
+  })
+
   socket.on('bet', function(bet){
   	db.collection("gameState").findOne({}, function(err, result){
   		if (err) throw err;
@@ -412,7 +445,7 @@ io.on('connection', function(socket){
   			seats[turn].amountBet = bet 
   			//find next turn
   			//option of checking
-  			if ((result.bet === 2 && result.turn === result.lastBet && result.street == 'preflop') || (result.bet === 0 && result.turn === result.button) ){
+  			/*if ((result.bet === 2 && result.turn === result.lastBet && result.street == 'preflop') || (result.bet === 0 && result.turn === result.button) ){
   				nextStreet(result)
   			}
   			else{
@@ -430,7 +463,7 @@ io.on('connection', function(socket){
   					})
   				}
   			}
-  			
+  			*/
   	    }
   	})
   })

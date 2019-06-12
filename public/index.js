@@ -56,6 +56,9 @@ $(function () {
   document.getElementById('seat4').onclick = function(){
     socket.emit('take seat', {uid:uid, seat:4})
   }
+  document.getElementById('fold').onclick = function(){
+    socket.emit('fold', {uid:uid})
+  }
   $('#bet').submit(function(){
     var bet = parseInt($('#m').val())
     if (bet <= stackSize){
