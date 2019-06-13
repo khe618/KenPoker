@@ -98,9 +98,9 @@ $(function () {
       if (player !== null){
         if(player.uid == uid){
           found = true
-          stackSize = player.stackSize
+          stackSize = parseInt(player.stackSize)
           folded = player.folded
-          amountBet = player.amountBet
+          amountBet = parseInt(player.amountBet)
           stack.innerHTML = stackSize
           slider.max = stackSize;
           slider.min = state.bet
