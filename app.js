@@ -424,7 +424,16 @@ io.on('connection', function(socket){
   		var turn = result.turn
   		var seats = result.seats
   		seats[turn].folded = true
-  		handleNextAction(result)
+  		var playersInHand = getPlayersInHand(seats)
+		if (playersInHand.length == 1){
+			//everyone folded
+			result.seats[playersInHand[0]].stackSize += result.pot
+			newGame(result)
+		}
+		else{
+			handleNextAction(result)
+		}
+
   	})
   })
 
