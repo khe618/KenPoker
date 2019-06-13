@@ -452,6 +452,7 @@ io.on('connection', function(socket){
   			}
   			result.pot += bet - seats[turn].amountBet;
   			seats[turn].amountBet = bet 
+  			handleNextAction(result)
   			//find next turn
   			//option of checking
   			/*if ((result.bet === 2 && result.turn === result.lastBet && result.street == 'preflop') || (result.bet === 0 && result.turn === result.button) ){
