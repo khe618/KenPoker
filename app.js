@@ -478,12 +478,12 @@ io.on('connection', function(socket){
   	})
   })
   socket.on('chat message', function(msg){
-    //io.emit('chat message', msg);
+    io.emit('chat message', msg);
     var obj = {"text":msg}
-    db.collection("messages").insert(obj, function(err, result){
+    /*db.collection("messages").insert(obj, function(err, result){
     	if (err) throw err;
 
-    })
+    })*/
   });
   socket.on('take seat', function(data){
   	var seat = data.seat

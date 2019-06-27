@@ -29,7 +29,6 @@ $(function () {
     socket.emit('take seat', {uid:uid, seat:seatNum})
   }*/
 
-  var socket = io();
   initApp(socket)
   var stack = document.getElementById('stack')
   var stackSize = 200;
@@ -81,10 +80,13 @@ $(function () {
     }
     return false;
   })*/
-  /*socket.on('chat message', function(msg){
-    $('#messages').append($('<li>').text(msg));
-    window.scrollTo(0, document.body.scrollHeight);
-  });*/
+  $('#message_form').submit(function(){
+    socket.emit('chat message', {uid: uid, msg: $('#message_input').val()});
+    $('#message_input').val('');
+    return false;
+  });
+  socket.on('chat message', function(msg){
+  });
   socket.on('cards', function(cards){
     var cardElem = document.getElementById('cards')
     cardElem.style.display = 'block'

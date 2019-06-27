@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app="blogApp">
+<html ng-app="pokerApp">
   <head>
     <title>KenPoker</title>
 
@@ -15,18 +15,13 @@
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
   <script src="init.js"></script>
   <script src="index.js"></script>
+  <script src="chat-post.component.js"></script>
+  <script src="chat-box.component.js"></script>
 
   <body>
     <div ng-controller="MyAuthCtrl">
     <button onclick="signOut()">Log out</button>
     <p id="myId">My id:</p>
-    <!--<form id="seat" style="display:none"action="">
-      <input type="radio" name="seat" value="1" id="seat1"> Seat 1<br>
-      <input type="radio" name="seat" value="2" id="seat2"> Seat 2<br>
-      <input type="radio" name="seat" value="3" id="seat3"> Seat 3<br> 
-      <input type="radio" name="seat" value="4" id="seat4"> Seat 4<br>
-      <button>Take seat</button> 
-    </form><!-->
     <p>Seat 1: <button class="btn btn-secondary float-right" style="display:none" id="seat1">Take seat</button></p>
     <p id="seat1info"></p>
     <p>Seat 2: <button class="btn btn-secondary float-right" style="display:none"  id="seat2">Take seat</button></p>
@@ -48,6 +43,39 @@
     <button id="fold">Fold</button>
     </div>
 
+    <!--<form action="" id="message_form">
+      <input id="message_input" autocomplete="off" /><button>Send</button>
+    </form>-->
+    <!--<div class="container">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="accordion">
+                    <span class="glyphicon glyphicon-comment"></span> Chat
+                    <div class="btn-group pull-right">
+                        <a type="button" class="btn btn-default btn-xs" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </a>
+                    </div>
+                </div>
+            <div class="panel-collapse collapse" id="collapseOne">
+                <chat-post value="test"></chat-post>
+                <div class="panel-footer">
+                    <div class="input-group">
+                      <form class="form-inline" id="message_form">
+                        <div class="form-group mx-sm-3 mb-2">
+                          <input class="form-control" id="message_input" autocomplete="off">
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-2">Send</button>
+                      </form>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>-->
+    <chat-box></chat-box>
     </div>
   </body>
 </html>

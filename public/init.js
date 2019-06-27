@@ -1,9 +1,11 @@
-var app = angular.module('blogApp', ["firebase"]);
+var app = angular.module('pokerApp', ["firebase"]);
 var uid;
+var socket = io();
+
 app.controller("MyAuthCtrl", ["$scope", "$rootScope", "$http", "$firebaseAuth",
   function($scope, $rootScope, $http, $firebaseAuth) {
     $scope.authObj = $firebaseAuth();
-  $scope.authObj.$onAuthStateChanged(function(firebaseUser) {
+    $scope.authObj.$onAuthStateChanged(function(firebaseUser) {
       if (firebaseUser) {
           console.log("Signed in as:", firebaseUser.uid);
           uid = firebaseUser.uid
@@ -11,6 +13,9 @@ app.controller("MyAuthCtrl", ["$scope", "$rootScope", "$http", "$firebaseAuth",
       } else {
           console.log("Signed out");
       }
+      socket.on('chat message', function(msg){
+        $rootScope.$broadcast('chat message', msg)
+      })
   });
   
   }
