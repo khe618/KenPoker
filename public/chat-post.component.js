@@ -9,7 +9,7 @@ angular.
                             '<div class="chat-body clearfix">' +
                                 '<div class="header">' +
                                     '<strong class="primary-font">{{$ctrl.uid}}</strong> <small class="pull-right text-muted">' +
-                                        '<span class="glyphicon glyphicon-time"></span>12 mins ago</small>' +
+                                        '<span class="glyphicon glyphicon-time"></span>{{$ctrl.timeStamp}}</small>' +
                                 '</div>' +
                                 '<p>' +
                                     '{{$ctrl.msg}}'+
@@ -17,11 +17,13 @@ angular.
                             '</div>' +
                         '</li>',
       controller: function chatPostController($element){
-      	//this.msg = $element.attr("msg");
+      	//this.timeStamp = $element.attr("timeStamp");
+      	//this.timeStamp = "test"
 
       },
       bindings: {
       	msg: '=',
+      	timeStamp: '=',
       	uid: '='
       }
   	})

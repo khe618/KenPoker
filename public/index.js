@@ -34,6 +34,7 @@ $(function () {
   var stackSize = 200;
   var folded = true;
   var amountBet;
+  var currentBet;
   var player;
   stack.innerHTML = stackSize;
   var output = document.getElementById('value')
@@ -70,6 +71,17 @@ $(function () {
     }
     return false;
   });
+  document.getElementById("checkCall").onclick = function (){
+    //all in
+    //console.log(currentBet)
+    //console.log(amountBet)
+    if (currentBet < stackSize + amountBet){
+      socket.emit('bet', currentBet)
+    }
+    else{
+      socket.emit('bet', stackSize + amountBet)
+    }
+  }
   /*$('#seat').submit(function(){
     var radios = document.getElementsByName('seat');
     for (var radio of radios){
@@ -81,7 +93,7 @@ $(function () {
     return false;
   })*/
   $('#message_form').submit(function(){
-    socket.emit('chat message', {uid: uid, msg: $('#message_input').val()});
+    socket.emit('chat message', {uid: uid, msg: $('#message_input').val(), timeStamp: new Date()});
     $('#message_input').val('');
     return false;
   });
@@ -90,7 +102,9 @@ $(function () {
   socket.on('cards', function(cards){
     var cardElem = document.getElementById('cards')
     cardElem.style.display = 'block'
-    cardElem.innerHTML = 'Cards: ' + cards[0] + cards[1]
+    //cardElem.innerHTML = 'Cards: ' + cards[0] + cards[1]
+    document.getElementById("card0").src = "imgs/" + cards[0] + ".png"
+    document.getElementById("card1").src = "imgs/" + cards[1] + ".png"
   })
   socket.on('game state', function(state){
     var found = false;
@@ -103,11 +117,21 @@ $(function () {
           stackSize = parseInt(player.stackSize)
           folded = player.folded
           amountBet = parseInt(player.amountBet)
-          stack.innerHTML = stackSize
+          stack.innerHTML = stackSize;
+          currentBet = state.bet
           slider.max = stackSize;
-          slider.min = state.bet
-          slider.value = state.bet
-          output.innerHTML = state.bet
+          slider.min = currentBet;
+          slider.value = currentBet;
+          output.innerHTML = currentBet;
+          if (currentBet == 0){
+            document.getElementById("checkCall").innerHTML = "Check"
+          }
+          else if (currentBet < stackSize + amountBet) {
+            document.getElementById("checkCall").innerHTML = "Call " + (state.bet - amountBet)
+          }
+          else{
+            document.getElementById("checkCall").innerHTML = "All-in"
+          }
         }
         document.getElementById("seat" + i + "info").innerHTML = 
         "id: " + player.uid + " Stack: " + player.stackSize + " Amount Bet: " + player.amountBet + " Folded: " + player.folded

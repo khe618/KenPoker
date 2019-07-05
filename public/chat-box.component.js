@@ -14,11 +14,13 @@ angular.
                     	  '</div>' +
                 		'</div>' +
             			'<div class="panel-collapse collapse" id="collapseOne">' +
-            			  '<div class="panel-body">' +
+            			  '<div class="panel-body" id="scrollArea">' +
             			  	'<ul class="chat">' +
             			      '<span ng-repeat="post in $ctrl.posts">' +
-            			        '<chat-post msg="post.msg" uid="post.uid"></chat-post>' +
+            			        '<chat-post msg="post.msg" uid="post.uid" time-stamp="post.timeStamp"></chat-post>' +
+            			        '<p>{{post.timeStamp}}</p>' +
             			      '</span>' + 
+            			      '<chat-post msg="plkj" uid="pkj" time-stamp = "plkj"></chat-post>' +
             			    '</ul>' +
                           '</div>' +
                 		  '<div class="panel-footer">' +
@@ -40,8 +42,18 @@ angular.
 	  	var self = this;
 	  	self.posts = []
 	  	$scope.$on("chat message", function (event, args){
+	  		//console.log(args)
+	  		//console.log(new Date(args.timeStamp))
+	  		//a = new Date(args.timeStamp)
+	  		//console.log(a.toLocaleTimeString('en-US'))
+	  		var timeStamp = new Date(args.timeStamp)
+	  		timeStamp = timeStamp.toLocaleTimeString('en-US')
+	  		args.timeStamp = timeStamp
+	  		console.log(args)
 	  		self.posts.push(args)
 	  		$scope.$apply();
+	  		var scrollArea = document.getElementById("scrollArea")
+	  		scrollArea.scrollTop = scrollArea.scrollHeight
 	  	})
 	  }
 	})

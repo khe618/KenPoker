@@ -24,7 +24,7 @@ for (var i = 0; i < 52; i++){
 	deck[i] = i
 }
 shuffleArray(deck)
-var suits = ['s', 'd', 'h', 'c']
+var suits = ['S', 'D', 'H', 'C']
 var ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 /*app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
