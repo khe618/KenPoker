@@ -559,9 +559,11 @@ io.on('connection', function(socket){
   			/*if (seats[turn].stackSize === 0){
   				seats[turn].folded = true
   			}*/
+
+  			//if anyone is all in, they don't need to call a raise
   			if (bet > 0){
   				for (var i = 1; i <= 4; i++){
-  					if (seats[i] != null && seats[i].stackSize === 0){
+  					if (seats[i] != null && seats[i].stackSize === 0 && i != result.lastBet){
   						seats[i].folded = true
   					}
   				}
