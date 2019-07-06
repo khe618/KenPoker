@@ -275,7 +275,7 @@ function findNextPlayer(result, i){
 	var temp = i + 1;
 	temp = temp % 4;
 	var seats = result.seats
-	while (temp != i && (seats[temp] == null || seats[temp].folded || temp === result.lastBet)){
+	while (temp != i && (seats[temp] == null || seats[temp].folded)){
 		temp += 1;
 		temp %= 4;
 	}
@@ -550,9 +550,9 @@ io.on('connection', function(socket){
   			}
   			result.pot += bet - seats[turn].amountBet;
   			seats[turn].amountBet = bet
-  			if (seats[turn].stackSize === 0){
+  			/*if (seats[turn].stackSize === 0){
   				seats[turn].folded = true
-  			} 
+  			}*/ 
   			handleNextAction(result)
   			//find next turn
   			//option of checking
