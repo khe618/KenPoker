@@ -286,6 +286,7 @@ function findLastPlayer(result){
 	var temp = result.button + 1;
 	temp = temp % 4;
 	var lastPlayer;
+	var seats = result.seats
 	while(true){
 		if (!(seats[temp] == null || seats[temp].folded)){
 			lastPlayer = temp;
