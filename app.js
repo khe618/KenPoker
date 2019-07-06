@@ -407,9 +407,7 @@ function nextStreet(result){
 					}
 				}
 			}
-			else{
-				newGame(result)
-			}
+			newGame(result)
 			return;
 		}
 		if (street == 'river'){

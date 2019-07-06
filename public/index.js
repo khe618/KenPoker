@@ -124,6 +124,7 @@ $(function () {
             document.getElementById("raise").innerHTML = "All-in " + (stackSize + amountBet)
           }
           else{
+            slider.disabled = false
             slider.min = currentBet + state.previousRaise
             document.getElementById("raise").innerHTML = "Raise " + (currentBet + state.previousRaise);
           }
