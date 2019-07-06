@@ -116,10 +116,20 @@ $(function () {
           amountBet = parseInt(player.amountBet)
           stack.innerHTML = stackSize;
           currentBet = state.bet
+          //console.log(currentBet + state.previousRaise)
+          //console.log(stackSize + amountBet)
+          if (currentBet + state.previousRaise > stackSize + amountBet){
+            slider.min = stackSize + amountBet;
+            slider.disabled = true;
+            document.getElementById("raise").innerHTML = "All-in " + (stackSize + amountBet)
+          }
+          else{
+            slider.min = currentBet + state.previousRaise
+            document.getElementById("raise").innerHTML = "Raise " + (currentBet + state.previousRaise);
+          }
           slider.max = stackSize + amountBet;
-          slider.min = currentBet + state.previousRaise
           slider.value = currentBet + state.previousRaise;
-          document.getElementById("raise").innerHTML = "Raise " + (currentBet + state.previousRaise);
+          
           if (currentBet === amountBet){
             document.getElementById("checkCall").innerHTML = "Check"
           }

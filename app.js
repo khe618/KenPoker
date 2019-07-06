@@ -282,6 +282,23 @@ function findNextPlayer(result, i){
 	return temp;
 }
 
+function findLastPlayer(result){
+	var temp = result.button + 1;
+	temp = temp % 4;
+	var lastPlayer;
+	while(true){
+		if (!(seats[temp] == null || seats[temp].folded)){
+			lastPlayer = temp;
+		}
+		if (temp === result.button){
+			break
+		}
+		temp += 1;
+		temp %= 4;
+	}
+	return lastPlayer
+}
+
 
 function newGame(result){
 	var seats = result.seats
@@ -433,7 +450,7 @@ function nextStreet(result){
 		}
 		result.bet = 0;
 		result.previousRaise = 2;
-		result.lastBet = result.button;
+		result.lastBet = findLastPlayer(result);
 		result.turn = findNextPlayer(result, result.button)
 		db.collection("gameState").update({}, result, function(err, result2){
   			if (err) throw err;
