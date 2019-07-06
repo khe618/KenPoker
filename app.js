@@ -329,7 +329,7 @@ function nextStreet(result){
 			for (var i = 1; i <= 4; i++){
 				var player = result.seats[i];
 				if (player !== null && player.amountBet > 0 && player.stackSize == 0){
-					sidePotPlayers.append({uid: player.uid, amountBet: player.amountBet})
+					sidePotPlayers.push({uid: player.uid, amountBet: player.amountBet})
 				}
 			}
 			sidePotPlayers.sort(x => x.amountBet)
