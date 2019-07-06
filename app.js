@@ -193,23 +193,37 @@ function isFolded(result, uid){
 	return true
 }
 
-function determineWinners(result, cards){
+//players is an array of the uids of the players eligible to win the hand
+function determineWinners(result, cards, players){
 	var community = result.community
-	var winners = [cards.players[0].uid]
-	var bestRanking = myBestHand(community.concat(cards.players[0].cards))[1]
+	//var winners = [cards.players[seats[0]].uid]
+	//var bestRanking = myBestHand(community.concat(cards.players[seats[0]].cards))[1]
+	var winners = []
+	var bestRanking;
 	var nextRanking;
 	var comparison;
-	for (var i = 1; i < cards.players.length; i++){
-		if (!isFolded(result, cards.players[i].uid)){
-			nextRanking = myBestHand(community.concat(cards.players[i].cards))[1]
-			comparison = compareHands(nextRanking, bestRanking)
-			if (comparison > 0){
-				bestRanking = nextRanking
-				winners = [cards.players[i].uid]
+	var seat;
+	for (var i = 1; i < cards.length; i++){
+		//seat = seats[i];
+		//console.log(seat)
+		//console.log(cards.players)
+		if (players.includes(cards.players[i].uid) ){
+			if (winners.length == 0){
+				winners.push(card.players[i].uid)
+				bestRanking = myBestHand(community.concat(card.players[i].cards))[1]
 			}
-			else if (comparison === 0){
-				winners.push(cards.players[i].uid)
+			else{
+				nextRanking = myBestHand(community.concat(cards.players[i].cards))[1]
+				comparison = compareHands(nextRanking, bestRanking)
+				if (comparison > 0){
+					bestRanking = nextRanking
+					winners = [cards.players[i].uid]
+				}
+				else if (comparison === 0){
+					winners.push(cards.players[i].uid)
+				}
 			}
+			
 		}
 	}
 	return winners;
@@ -312,94 +326,103 @@ function newGame(result){
 }
 
 function nextStreet(result){
-	var street = result.street
-	var playersInHand = getPlayersInHand(result.seats)
-	if (playersInHand.length == 1){
-		//everyone folded
-		result.seats[playersInHand[0]].stackSize += result.pot
-		newGame(result)
-		return;
-	}
-	else{
-		db.collection("cards").findOne({}, function(err, result2){
-			if (err) throw err;
-			//create side pots if necessary
-			var sidePotPlayers = [];
-			var sidePots = [];
-			var isAllIn = false;
-			for (var i = 1; i <= 4; i++){
-				var player = result.seats[i];
-				if (player !== null && player.amountBet > 0){
-					if (player.stackSize === 0){
-						isAllIn = true
+	db.collection("cards").findOne({}, function(err, result2){
+		if (err) throw err;
+		var street = result.street
+		//create side pots if necessary
+		var sidePotPlayers = [];
+		var sidePots = [];
+		var isAllIn = false;
+		for (var i = 1; i <= 4; i++){
+			var player = result.seats[i];
+			if (player !== null && player.amountBet > 0){
+				if (player.stackSize === 0){
+					isAllIn = true
+				}
+				sidePotPlayers.push({uid: player.uid, amountBet: player.amountBet, seat:i})
+			}
+		}
+		if (isAllIn){
+			sidePotPlayers.sort(x => x.amountBet)
+			for (var i = 0; i < sidePotPlayers.length; i++){
+				var player = sidePotPlayers[i];
+				if (player.amountBet > 0){
+					var newSidePot = {};
+					newSidePot.players = []
+					newSidePot.pot = 0;
+					var allInAmount = player.amountBet
+					for (var j = i; j < sidePotPlayers.length; j++){
+						sidePotPlayers[j].amountBet -= allInAmount;
+						newSidePot.players.push(sidePotPlayers[j].uid);
 					}
-					sidePotPlayers.push({uid: player.uid, amountBet: player.amountBet})
+					newSidePot.pot = allInAmount * (sidePotPlayers.length - i)
+					result.pot -= newSidePot.pot
+					sidePots.push(newSidePot)
+				}
+				if (player.stackSize === 0){
+					result.seats[player.seat].folded = true
 				}
 			}
-			if (isAllIn){
-				sidePotPlayers.sort(x => x.amountBet)
-				for (var i = 0; i < sidePotPlayers.length; i++){
-					if (sidePotPlayers[i].amountBet > 0){
-						var newSidePot = {};
-						newSidePot.players = []
-						newSidePot.pot = 0;
-						var allInAmount = sidePotPlayers[i].amountBet
-						for (var j = i; j < sidePotPlayers.length; j++){
-							sidePotPlayers[j].amountBet -= allInAmount;
-							newSidePot.players.push(sidePotPlayers[j].uid);
-						}
-						newSidePot.pot = allInAmount * (sidePotPlayers.length - i)
-						result.pot -= newSidePot.pot
-						sidePots.push(newSidePot)
-					}
+			result.sidePots = result.sidePots.concat(sidePots)
+		}
+		var playersInHand = getPlayersInHand(result.seats)
+		if (playersInHand.length == 1){
+			//everyone folded
+			result.seats[playersInHand[0]].stackSize += result.pot
+			/*if (result.sidePots.length > 0){
+				for (var i = 0; i < 5; i++){
+					result.community[i] = result2.community[i]
 				}
-				result.sidePots = result.sidePots.concat(sidePots)
-			}
-			
-			if (street == 'river'){
-				winners = determineWinners(result, result2)
-				/*for (var winner of winners){
-					result.seats[winner].stackSize += Math.floor(result.pot / winners.length)
-				}*/
-				for (var i = 1; i<= 4; i++){
-					if (result.seats[i] !== null && winners.includes(result.seats[i].uid)){
-						result.seats[i].stackSize += Math.floor(result.pot / winners.length)
-					}
-				}
+				for (var sidePot of result.)
+			}*/
+			//else{
 				newGame(result)
-				return;
-			}
-			if (street == 'preflop'){
-				result.street = 'flop'
-				result.community[0] = result2.community[0]
-				result.community[1] = result2.community[1]
-				result.community[2] = result2.community[2]
-			}
-			else if (street == 'flop'){
-				result.street = 'turn'
-				result.community[3] = result2.community[3]
-			}
-			else if (street == 'turn'){
-				result.street = 'river';
-				result.community[4] = result2.community[4]
-			}
-			//var seatNums = getSeatNums(result.seats)
-			for (var i = 1; i <= 4; i++){
-				if(result.seats[i] !== null){
-					result.seats[i].amountBet = 0
+			//}
+			return;
+		}
+		if (street == 'river'){
+			console.log(playersInHand)
+			winners = determineWinners(result, result2, playersInHand.map(x => result.seats[x].uid))
+			/*for (var winner of winners){
+				result.seats[winner].stackSize += Math.floor(result.pot / winners.length)
+			}*/
+			for (var i = 1; i<= 4; i++){
+				if (result.seats[i] !== null && winners.includes(result.seats[i].uid)){
+					result.seats[i].stackSize += Math.floor(result.pot / winners.length)
 				}
 			}
-			result.bet = 0;
-			result.previousRaise = 2;
-			result.lastBet = result.button;
-			result.turn = findNextPlayer(result, result.button)
-			db.collection("gameState").update({}, result, function(err, result2){
-  				if (err) throw err;
-  				io.emit("game state", result)
-  			})
-		})
-		
-	}
+			newGame(result)
+			return;
+		}
+		if (street == 'preflop'){
+			result.street = 'flop'
+			result.community[0] = result2.community[0]
+			result.community[1] = result2.community[1]
+			result.community[2] = result2.community[2]
+		}
+		else if (street == 'flop'){
+			result.street = 'turn'
+			result.community[3] = result2.community[3]
+		}
+		else if (street == 'turn'){
+			result.street = 'river';
+			result.community[4] = result2.community[4]
+		}
+		//var seatNums = getSeatNums(result.seats)
+		for (var i = 1; i <= 4; i++){
+			if(result.seats[i] !== null){
+				result.seats[i].amountBet = 0
+			}
+		}
+		result.bet = 0;
+		result.previousRaise = 2;
+		result.lastBet = result.button;
+		result.turn = findNextPlayer(result, result.button)
+		db.collection("gameState").update({}, result, function(err, result2){
+  			if (err) throw err;
+  			io.emit("game state", result)
+  		})
+	})
 }
 
 app.get("/login", function(req, res){
