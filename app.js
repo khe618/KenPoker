@@ -275,7 +275,7 @@ function findNextPlayer(result, i){
 	var temp = i + 1;
 	temp = temp % 4;
 	var seats = result.seats
-	while (temp != i && (seats[temp] == null || seats[temp].folded)){
+	while (temp != i && (seats[temp] == null || seats[temp].folded || temp === result.lastBet)){
 		temp += 1;
 		temp %= 4;
 	}
@@ -500,7 +500,7 @@ io.on('connection', function(socket){
   	}
   	else{
   		result.turn = findNextPlayer(result, result.turn)
-  		console.log(result.turn)
+  		//console.log(result.turn)
   		if (result.turn === result.lastBet && !((result.bet === 2 && result.street == 'preflop') || 
   			(result.bet === 0 && result.turn === result.lastBet))){
   			//option of checking
