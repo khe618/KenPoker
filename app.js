@@ -370,15 +370,22 @@ function nextStreet(result){
 		if (playersInHand.length == 1){
 			//everyone folded
 			result.seats[playersInHand[0]].stackSize += result.pot
-			/*if (result.sidePots.length > 0){
+			if (result.sidePots.length > 0){
 				for (var i = 0; i < 5; i++){
 					result.community[i] = result2.community[i]
 				}
-				for (var sidePot of result.)
-			}*/
-			//else{
+				for (var sidePot of result.sidePots){
+					winners = determineWinners(result, result2, sidePot.players)
+					for (var i = 1; i<= 4; i++){
+						if (result.seats[i] !== null && winners.includes(result.seats[i].uid)){
+							result.seats[i].stackSize += Math.floor(sidePot.pot / winners.length)
+						}
+					}
+				}
+			}
+			else{
 				newGame(result)
-			//}
+			}
 			return;
 		}
 		if (street == 'river'){
