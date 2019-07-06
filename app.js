@@ -203,14 +203,15 @@ function determineWinners(result, cards, players){
 	var nextRanking;
 	var comparison;
 	var seat;
-	for (var i = 1; i < cards.length; i++){
+	for (var i = 0; i < cards.players.length; i++){
 		//seat = seats[i];
 		//console.log(seat)
 		//console.log(cards.players)
+		//console.log(cards.players[i].uid)
 		if (players.includes(cards.players[i].uid) ){
-			if (winners.length == 0){
-				winners.push(card.players[i].uid)
-				bestRanking = myBestHand(community.concat(card.players[i].cards))[1]
+			if (winners.length === 0){
+				winners.push(cards.players[i].uid)
+				bestRanking = myBestHand(community.concat(cards.players[i].cards))[1]
 			}
 			else{
 				nextRanking = myBestHand(community.concat(cards.players[i].cards))[1]
@@ -381,7 +382,7 @@ function nextStreet(result){
 			return;
 		}
 		if (street == 'river'){
-			console.log(playersInHand)
+			//console.log(playersInHand.map(x => result.seats[x].uid))
 			winners = determineWinners(result, result2, playersInHand.map(x => result.seats[x].uid))
 			/*for (var winner of winners){
 				result.seats[winner].stackSize += Math.floor(result.pot / winners.length)
