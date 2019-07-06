@@ -492,7 +492,7 @@ io.on('connection', function(socket){
 
 
   function handleNextAction(result){
-  	if ((result.bet === 2 && result.turn === result.lastBet && result.street == 'preflop') || (result.bet === 0 && result.turn === result.button) ){
+  	if ((result.bet === 2 && result.turn === result.lastBet && result.street == 'preflop') || (result.bet === 0 && result.turn === result.lastBet) ){
   		nextStreet(result)
   	}
   	else{
