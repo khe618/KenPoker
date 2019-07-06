@@ -469,7 +469,7 @@ io.on('connection', function(socket){
   		var seats = result.seats;
   		var turn = result.turn;
   		var currentBet = result.bet
-  		if (seats[turn].stackSize >= bet && bet >= result.bet){
+  		if (seats[turn].stackSize + seats[turn].amountBet >= bet && bet >= result.bet){
   			seats[turn].stackSize -= bet - seats[turn].amountBet
   			//raise
   			if (bet > result.bet){
