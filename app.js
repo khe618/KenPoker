@@ -499,7 +499,7 @@ io.on('connection', function(socket){
   		result.turn = findNextPlayer(result, result.turn)
   		console.log(result.turn)
   		if (result.turn === result.lastBet && !((result.bet === 2 && result.street == 'preflop') || 
-  			(result.bet === 0 && result.turn === result.button))){
+  			(result.bet === 0 && result.turn === result.lastBet))){
   			//option of checking
   			nextStreet(result)
   		}
