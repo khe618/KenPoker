@@ -537,7 +537,7 @@ io.on('connection', function(socket){
   		var seats = result.seats;
   		var turn = result.turn;
   		var currentBet = result.bet
-  		if (seats[turn].stackSize + seats[turn].amountBet >= bet && bet >= result.bet){
+  		if (seats[turn].stackSize + seats[turn].amountBet >= bet){
   			seats[turn].stackSize -= bet - seats[turn].amountBet
   			//raise
   			if (bet > result.bet){
@@ -546,7 +546,10 @@ io.on('connection', function(socket){
   				result.lastBet = turn
   			}
   			result.pot += bet - seats[turn].amountBet;
-  			seats[turn].amountBet = bet 
+  			seats[turn].amountBet = bet
+  			if (seats[turn].stackSize === 0){
+  				seats[turn].folded = true
+  			} 
   			handleNextAction(result)
   			//find next turn
   			//option of checking
