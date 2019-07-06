@@ -116,7 +116,7 @@ $(function () {
           amountBet = parseInt(player.amountBet)
           stack.innerHTML = stackSize;
           currentBet = state.bet
-          slider.max = stackSize;
+          slider.max = stackSize + amountBet;
           slider.min = currentBet + state.previousRaise
           slider.value = currentBet + state.previousRaise;
           document.getElementById("raise").innerHTML = "Raise " + (currentBet + state.previousRaise);

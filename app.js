@@ -473,9 +473,9 @@ io.on('connection', function(socket){
   			seats[turn].stackSize -= bet - seats[turn].amountBet
   			//raise
   			if (bet > result.bet){
+  				result.previousRaise = bet - result.bet
   				result.bet = bet
   				result.lastBet = turn
-  				result.previousRaise = bet - result.bet
   			}
   			result.pot += bet - seats[turn].amountBet;
   			seats[turn].amountBet = bet 
