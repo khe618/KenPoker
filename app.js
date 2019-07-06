@@ -326,29 +326,36 @@ function nextStreet(result){
 			//create side pots if necessary
 			var sidePotPlayers = [];
 			var sidePots = [];
+			var isAllIn = false;
 			for (var i = 1; i <= 4; i++){
 				var player = result.seats[i];
-				if (player !== null && player.amountBet > 0 && player.stackSize == 0){
+				if (player !== null && player.amountBet > 0){
+					if (player.stackSize === 0){
+						isAllIn = true
+					}
 					sidePotPlayers.push({uid: player.uid, amountBet: player.amountBet})
 				}
 			}
-			sidePotPlayers.sort(x => x.amountBet)
-			for (var i = 0; i < sidePotPlayers.length; i++){
-				if (sidePotPlayers[i].amountBet > 0){
-					var newSidePot = {};
-					newSidePot.players = []
-					newSidePot.pot = 0;
-					var allInAmount = sidePotPlayers[i].amountBet
-					for (var j = i; j < sidePotPlayers.length; j++){
-						sidePotPlayers[j].amountBet -= allInAmount;
-						newSidePot.players.push(sidePotPlayers[j].uid);
+			if (isAllIn){
+				sidePotPlayers.sort(x => x.amountBet)
+				for (var i = 0; i < sidePotPlayers.length; i++){
+					if (sidePotPlayers[i].amountBet > 0){
+						var newSidePot = {};
+						newSidePot.players = []
+						newSidePot.pot = 0;
+						var allInAmount = sidePotPlayers[i].amountBet
+						for (var j = i; j < sidePotPlayers.length; j++){
+							sidePotPlayers[j].amountBet -= allInAmount;
+							newSidePot.players.push(sidePotPlayers[j].uid);
+						}
+						newSidePot.pot = allInAmount * (sidePotPlayers.length - i)
+						result.pot -= newSidePot.pot
+						sidePots.push(newSidePot)
 					}
-					newSidePot.pot = allInAmount * (sidePotPlayers.length - i)
-					result.pot -= newSidePot.pot
-					sidePots.push(newSidePot)
 				}
+				result.sidePots = result.sidePots.concat(sidePots)
 			}
-			result.sidePots = result.sidePots.concat(sidePots)
+			
 			if (street == 'river'){
 				winners = determineWinners(result, result2)
 				/*for (var winner of winners){
