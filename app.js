@@ -326,7 +326,7 @@ function newGame(result){
 		seats[smallBlind].amountBet = 1
 		seats[smallBlind].stackSize -= 1;
 		seats[bigBlind].amountBet = 2
-		seats[bigBlind].stackSize -= 1;
+		seats[bigBlind].stackSize -= 2;
 		result.lastBet = bigBlind
 	}
 	var playerIds =[]
@@ -492,7 +492,10 @@ io.on('connection', function(socket){
 
 
   function handleNextAction(result){
-  	if ((result.bet === 2 && result.turn === result.lastBet && result.street == 'preflop') || (result.bet === 0 && result.turn === result.lastBet) ){
+  	var players = getPlayersInHand(result.seats)
+  	if ((result.bet === 2 && result.turn === result.lastBet && result.street == 'preflop') || 
+  		(result.bet === 0 && result.turn === result.lastBet) ||
+  		(players.length == 1 && players[0] === result.turn)){
   		nextStreet(result)
   	}
   	else{
