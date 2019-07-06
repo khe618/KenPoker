@@ -399,6 +399,15 @@ function nextStreet(result){
 					result.seats[i].stackSize += Math.floor(result.pot / winners.length)
 				}
 			}
+			//determine sidepots
+			for (var sidePot of result.sidePots){
+				winners = determineWinners(result, result2, sidePot.players)
+				for (var i = 1; i<= 4; i++){
+					if (result.seats[i] !== null && winners.includes(result.seats[i].uid)){
+						result.seats[i].stackSize += Math.floor(sidePot.pot / winners.length)
+					}
+				}
+			}
 			newGame(result)
 			return;
 		}
