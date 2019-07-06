@@ -335,7 +335,7 @@ function nextStreet(result){
 			sidePotPlayers.sort(x => x.amountBet)
 			for (var i = 0; i < sidePotPlayers.length; i++){
 				if (sidePotPlayers[i].amountBet > 0){
-					var newSidePot;
+					var newSidePot = {};
 					newSidePot.players = []
 					for (var j = i; j < sidePotPlayers.length; j++){
 						sidePotPlayers[j].amountBet -= sidePotPlayers[i].amountBet;
