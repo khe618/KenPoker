@@ -18,9 +18,7 @@ angular.
             			  	'<ul class="chat">' +
             			      '<span ng-repeat="post in $ctrl.posts">' +
             			        '<chat-post msg="post.msg" uid="post.uid" time-stamp="post.timeStamp"></chat-post>' +
-            			        '<p>{{post.timeStamp}}</p>' +
             			      '</span>' + 
-            			      '<chat-post msg="plkj" uid="pkj" time-stamp = "plkj"></chat-post>' +
             			    '</ul>' +
                           '</div>' +
                 		  '<div class="panel-footer">' +

@@ -276,6 +276,7 @@ function newGame(result){
 		seats[seatNum].folded = false;
 	}
 	result.bet = 2;
+	result.previousRaise = 2;
 	result.button = findNextPlayer(result, result.button)
 	if (seatNums.length == 2){
 		result.lastBet = findNextPlayer(result, result.button) //big blind
@@ -300,6 +301,7 @@ function newGame(result){
   		playerIds.push(seats[seatNum].uid)
   	}
   	result.community = []
+  	result.sidePots = []
   	result.pot = 3;
   	result.street = "preflop"
   	dealCards(playerIds)
@@ -321,6 +323,29 @@ function nextStreet(result){
 	else{
 		db.collection("cards").findOne({}, function(err, result2){
 			if (err) throw err;
+			//create side pots if necessary
+			var sidePotPlayers = [];
+			var sidePots = [];
+			for (var i = 1; i <= 4; i++){
+				var player = result.seats[i];
+				if (player !== null && player.amountBet > 0 && player.stackSize == 0){
+					sidePotPlayers.append({uid: player.uid, amountBet: player.amountBet})
+				}
+			}
+			sidePotPlayers.sort(x => x.amountBet)
+			for (var i = 0; i < sidePotPlayers.length; i++){
+				if (sidePotPlayers[i].amountBet > 0){
+					var newSidePot;
+					newSidePot.players = []
+					for (var j = i; j < sidePotPlayers.length; j++){
+						sidePotPlayers[j].amountBet -= sidePotPlayers[i].amountBet;
+						newSidePot.players.push(sidePotPlayers[j].uid);
+					}
+					newSidePot.pot = sidePotPlayers[i].amountBet * (sidePotPlayers.length - i)
+					sidePots.push(newSidePot)
+				}
+			}
+			result.sidePots = result.sidePots.concat(sidePots)
 			if (street == 'river'){
 				winners = determineWinners(result, result2)
 				/*for (var winner of winners){
@@ -355,6 +380,7 @@ function nextStreet(result){
 				}
 			}
 			result.bet = 0;
+			result.previousRaise = 2;
 			result.lastBet = result.button;
 			result.turn = findNextPlayer(result, result.button)
 			db.collection("gameState").update({}, result, function(err, result2){
@@ -449,6 +475,7 @@ io.on('connection', function(socket){
   			if (bet > result.bet){
   				result.bet = bet
   				result.lastBet = turn
+  				result.previousRaise = bet - result.bet
   			}
   			result.pot += bet - seats[turn].amountBet;
   			seats[turn].amountBet = bet 
@@ -513,7 +540,7 @@ io.on('connection', function(socket){
   			seatNums.push(seat)
   			if (seatNums.length == 2){
   				//start game
-  				for (var seatNum of seatNums){
+  				/*for (var seatNum of seatNums){
   					seats[seatNum].folded = false
   				}
   				var playerIds =[]
@@ -531,12 +558,15 @@ io.on('connection', function(socket){
   				result.lastBet = seatNums[1]
   				result.pot = 3;
   				result.street = "preflop"
-  				result.community = []
+  				result.community = []*/
+  				newGame(result)
   			}
-  			db.collection('gameState').update({}, result, function(err, result2){
-  				if (err) throw err;
-  			})
-  			io.emit('game state', result)
+  			else{
+  				db.collection('gameState').update({}, result, function(err, result2){
+  					if (err) throw err;
+  					io.emit('game state', result)
+  				})
+  			}
   		}
   	})
   })

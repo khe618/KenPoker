@@ -37,12 +37,10 @@ $(function () {
   var currentBet;
   var player;
   stack.innerHTML = stackSize;
-  var output = document.getElementById('value')
   var slider = document.getElementById('m')
-  output.innerHTML = slider.value;
   slider.max = stackSize;
   slider.oninput = function() {
-    output.innerHTML = this.value;
+    document.getElementById("raise").innerHTML = "Raise " + this.value
   }
   document.getElementById('seat1').onclick = function(){
     socket.emit('take seat', {uid:uid, seat:1})
@@ -64,7 +62,6 @@ $(function () {
     if (bet <= stackSize){
       socket.emit('bet', bet);
       /*$('#m').val(1);
-      output.innerHTML = 1;
       stackSize -= bet
       stack.innerHTML = stackSize
       slider.max = stackSize*/
@@ -120,10 +117,10 @@ $(function () {
           stack.innerHTML = stackSize;
           currentBet = state.bet
           slider.max = stackSize;
-          slider.min = currentBet;
-          slider.value = currentBet;
-          output.innerHTML = currentBet;
-          if (currentBet == 0){
+          slider.min = currentBet + state.previousRaise
+          slider.value = currentBet + state.previousRaise;
+          document.getElementById("raise").innerHTML = "Raise " + (currentBet + state.previousRaise);
+          if (currentBet === amountBet){
             document.getElementById("checkCall").innerHTML = "Check"
           }
           else if (currentBet < stackSize + amountBet) {
