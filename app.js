@@ -337,11 +337,13 @@ function nextStreet(result){
 				if (sidePotPlayers[i].amountBet > 0){
 					var newSidePot = {};
 					newSidePot.players = []
+					newSidePot.pot = 0;
 					for (var j = i; j < sidePotPlayers.length; j++){
 						sidePotPlayers[j].amountBet -= sidePotPlayers[i].amountBet;
+						newSidePot.pot += sidePotPlayers[i].amountBet;
 						newSidePot.players.push(sidePotPlayers[j].uid);
 					}
-					newSidePot.pot = sidePotPlayers[i].amountBet * (sidePotPlayers.length - i)
+					result2.pot -= newSidePot.pot
 					sidePots.push(newSidePot)
 				}
 			}
