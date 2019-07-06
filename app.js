@@ -350,7 +350,7 @@ function nextStreet(result){
 		var street = result.street
 		var seats = result.seats
   		for (var i = 1; i <= 4; i++){
-  			if (seats[i].stackSize === 0){
+  			if (seats[i] != null && seats[i].stackSize === 0){
   				seats[i].folded = true
   			}
   		}
@@ -561,7 +561,7 @@ io.on('connection', function(socket){
   			}*/
   			if (bet > 0){
   				for (var i = 1; i <= 4; i++){
-  					if (seats[i].stackSize === 0){
+  					if (seats[i] != null && seats[i].stackSize === 0){
   						seats[i].folded = true
   					}
   				}
