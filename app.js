@@ -391,9 +391,11 @@ function nextStreet(result){
 			result.sidePots = result.sidePots.concat(sidePots)
 		}
 		var playersInHand = getPlayersInHand(result.seats)
-		if (playersInHand.length == 1){
+		if (playersInHand.length <= 1){
 			//everyone folded
-			result.seats[playersInHand[0]].stackSize += result.pot
+			if (playersInHand.length === 1){
+				result.seats[playersInHand[0]].stackSize += result.pot
+			}
 			if (result.sidePots.length > 0){
 				for (var i = 0; i < 5; i++){
 					result.community[i] = result2.community[i]
