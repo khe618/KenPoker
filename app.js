@@ -635,19 +635,20 @@ io.on('connection', function(socket){
   			if (isValid){
   				seats[seat] = {uid:uid, stackSize:200, folded:true, amountBet:0, standUp:false}
   				seatNums.push(seat)
+  				db.collection('balances').update({uid:uid}, {$inc: {balance: -200}}, function(err, result2){
+  					if (err) throw err;
+  					if (connectedUsers[uid]){
+  						connectedUsers[uid].emit('balance', -200)
+  					}
+  				})
   				if (seatNums.length == 2){
   					newGame(result)
   				}
   				else{
-  					db.collection('gameState').update({}, result, function(err, result2){
+  					db.collection('gameState').update({}, result, function(err, result3){
   						if (err) throw err;
 						io.emit('game state', result)
-  						db.collection('balances').update({uid:uid}, {$inc: {balance: -200}}, function(err, result3){
-  							if (err) throw err;
-  							if (connectedUsers[uid]){
-  								connectedUsers[uid].emit('balance', -200)
-  							}
-  						})
+  						
   					})
   				}
   			}
@@ -660,12 +661,12 @@ io.on('connection', function(socket){
   			for (var i = 1; i <= 4; i++){
   				if (result.seats[i] != null && result.seats[i].uid === uid){
   					result.seats[i].standUp = true
- 					db.collection('balances').update({uid:uid}, 
+ 					/*db.collection('balances').update({uid:uid}, 
  						{$inc: {balance: result.seats[i].stackSize}}, 
  						function(err, result2){
  							if (err) throw err;
  						}
- 					)
+ 					)*/
   				} 
   			}
   			db.collection('gameState').update({}, result, function(err, result3){
@@ -688,7 +689,7 @@ MongoClient.connect("mongodb://admin:password1@ds151707.mlab.com:51707/heroku_vk
 	  
       listUsersResult.users.forEach(function(userRecord) {
         console.log(userRecord.uid)
-        //db.collection("balances").insertOne({uid:userRecord.uid, balance:10000})
+        db.collection("balances").insertOne({uid:userRecord.uid, balance:10000})
       });
     })
     .catch(function(error) {
