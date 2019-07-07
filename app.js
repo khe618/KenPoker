@@ -318,36 +318,42 @@ function newGame(result){
 		}
 	}
 	var seatNums = getSeatNums(seats)
-	result.bet = 2;
-	result.previousRaise = 2;
-	result.button = findNextPlayer(result, result.button)
-	if (seatNums.length == 2){
-		result.lastBet = findNextPlayer(result, result.button) //big blind
-		seats[result.button].amountBet = 1;
-		seats[result.button].stackSize -= 1;
-		seats[result.lastBet].amountBet = 2;
-		seats[result.lastBet].stackSize -= 2;
-		result.turn = result.button
+	if (seatNums.length > 1){
+		result.bet = 2;
+		result.previousRaise = 2;
+		result.button = findNextPlayer(result, result.button)
+		if (seatNums.length == 2){
+			result.lastBet = findNextPlayer(result, result.button) //big blind
+			seats[result.button].amountBet = 1;
+			seats[result.button].stackSize -= 1;
+			seats[result.lastBet].amountBet = 2;
+			seats[result.lastBet].stackSize -= 2;
+			result.turn = result.button
+		}
+		else{
+			var smallBlind = findNextPlayer(result, result.button);
+			var bigBlind = findNextPlayer(result, smallBlind)
+			result.turn = findNextPlayer(result, bigBlind)
+			seats[smallBlind].amountBet = 1
+			seats[smallBlind].stackSize -= 1;
+			seats[bigBlind].amountBet = 2
+			seats[bigBlind].stackSize -= 2;
+			result.lastBet = bigBlind
+		}
+		var playerIds =[]
+  		for (seatNum of seatNums){
+  			playerIds.push(seats[seatNum].uid)
+  		}
+  		result.community = []
+  		result.sidePots = []
+  		result.pot = 3;
+  		result.street = "preflop"
+  		dealCards(playerIds)
 	}
 	else{
-		var smallBlind = findNextPlayer(result, result.button);
-		var bigBlind = findNextPlayer(result, smallBlind)
-		result.turn = findNextPlayer(result, bigBlind)
-		seats[smallBlind].amountBet = 1
-		seats[smallBlind].stackSize -= 1;
-		seats[bigBlind].amountBet = 2
-		seats[bigBlind].stackSize -= 2;
-		result.lastBet = bigBlind
+		result.seats = [null, null, null, null, null]
 	}
-	var playerIds =[]
-  	for (seatNum of seatNums){
-  		playerIds.push(seats[seatNum].uid)
-  	}
-  	result.community = []
-  	result.sidePots = []
-  	result.pot = 3;
-  	result.street = "preflop"
-  	dealCards(playerIds)
+	
   	db.collection("gameState").update({}, result, function(err, result2){
   		if (err) throw err;
   		io.emit("game state", result)
