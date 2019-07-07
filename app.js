@@ -317,7 +317,7 @@ function newGame(result){
 	}*/
 	for (var i = 1; i <= 4; i++){
 		if (seats[i] != null){
-			if (seats[i].standUp){
+			if (seats[i].standUp || seats[i].stackSize == 0){
 				db.collection('balances').update({uid:seats[i].uid}, 
  					{$inc: {balance: seats[i].stackSize}}, 
  					function(err, result2){

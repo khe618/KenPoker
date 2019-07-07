@@ -150,6 +150,7 @@ $(function () {
       }
       else{
         openSeats.push(i)
+        document.getElementById("seat" + i + "info").innerHTML = ""
       }
       
     }
