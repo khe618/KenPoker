@@ -79,6 +79,9 @@ $(function () {
       socket.emit('bet', stackSize + amountBet)
     }
   }
+  document.getElementById("standUp").onclick = function(){
+    socket.emit("stand up", uid)
+  }
   /*$('#seat').submit(function(){
     var radios = document.getElementsByName('seat');
     for (var radio of radios){

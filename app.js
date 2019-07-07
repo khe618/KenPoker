@@ -303,11 +303,21 @@ function findLastPlayer(result){
 
 function newGame(result){
 	var seats = result.seats
-	var seatNums = getSeatNums(seats)
-	for (var seatNum of seatNums){
+
+	/*for (var seatNum of seatNums){
 		seats[seatNum].amountBet = 0;
 		seats[seatNum].folded = false;
+	}*/
+	for (var i = 1; i <= 4; i++){
+		if (seats[i] != null && !seats[i].standUp){
+			seats[i].amountBet = 0;
+			seats[i].folded = false
+		}
+		else{
+			seats[i] = null
+		}
 	}
+	var seatNums = getSeatNums(seats)
 	result.bet = 2;
 	result.previousRaise = 2;
 	result.button = findNextPlayer(result, result.button)
@@ -480,185 +490,156 @@ app.get('/messages', function(req, res){
 })
 
 io.on('connection', function(socket){
-  //console.log(socket)
-  socket.on('login', function(uid){
-  	connectedUsers[uid] = socket
-  	db.collection("gameState").findOne({}, function(err, result){
-  		if (err) throw err;
-  		socket.emit('game state', result)
-  	})
-  	db.collection("cards").findOne({}, function(err, result){
-  		for (var player of result.players){
-  			if (player.uid == uid){
-  				socket.emit('cards', player.cards)
+  	//console.log(socket)
+  	socket.on('login', function(uid){
+  		connectedUsers[uid] = socket
+  		db.collection("gameState").findOne({}, function(err, result){
+  			if (err) throw err;
+  			socket.emit('game state', result)
+  		})
+  		db.collection("cards").findOne({}, function(err, result){
+  			for (var player of result.players){
+  				if (player.uid == uid){
+  					socket.emit('cards', player.cards)
+  				}
   			}
-  		}
+  		})
   	})
-  })
 
 
-  function handleNextAction(result){
-  	var players = getPlayersInHand(result.seats)
-  	if ((result.bet === 2 && result.turn === result.lastBet && result.street == 'preflop') || 
-  		(result.bet === 0 && result.turn === result.lastBet) ||
-  		(players.length == 1 && players[0] === result.turn)){
-  		nextStreet(result)
-  	}
-  	else{
-  		result.turn = findNextPlayer(result, result.turn)
-  		//console.log(result.turn)
-  		if (result.turn === result.lastBet && !((result.bet === 2 && result.street == 'preflop') || 
-  			(result.bet === 0 && result.turn === result.lastBet))){
-  			//option of checking
+  	function handleNextAction(result){
+  		var players = getPlayersInHand(result.seats)
+  		if ((result.bet === 2 && result.turn === result.lastBet && result.street == 'preflop') || 
+  			(result.bet === 0 && result.turn === result.lastBet) ||
+  			(players.length == 1 && players[0] === result.turn)){
   			nextStreet(result)
   		}
   		else{
-  			db.collection("gameState").update({}, result, function(err, result2){
-  				if (err) throw err;
-  				io.emit("game state", result)
-  			})
-  		}
-  	}
-  }
-
-  socket.on('fold', function(){
-  	db.collection("gameState").findOne({}, function(err, result){
-  		if (err) throw err;
-  		var turn = result.turn
-  		var seats = result.seats
-  		seats[turn].folded = true
-  		var playersInHand = getPlayersInHand(seats)
-		if (playersInHand.length == 1){
-			//everyone folded
-			result.seats[playersInHand[0]].stackSize += result.pot
-			newGame(result)
-		}
-		else{
-			handleNextAction(result)
-		}
-
-  	})
-  })
-
-  socket.on('bet', function(bet){
-  	db.collection("gameState").findOne({}, function(err, result){
-  		if (err) throw err;
-  		var seats = result.seats;
-  		var turn = result.turn;
-  		var currentBet = result.bet
-  		if (seats[turn].stackSize + seats[turn].amountBet >= bet){
-  			seats[turn].stackSize -= bet - seats[turn].amountBet
-  			//raise
-  			if (bet > result.bet){
-  				result.previousRaise = bet - result.bet
-  				result.bet = bet
-  				result.lastBet = turn
-  			}
-  			result.pot += bet - seats[turn].amountBet;
-  			seats[turn].amountBet = bet
-  			/*if (seats[turn].stackSize === 0){
-  				seats[turn].folded = true
-  			}*/
-
-  			//if anyone is all in, they don't need to call a raise
-  			if (bet > 0){
-  				for (var i = 1; i <= 4; i++){
-  					if (seats[i] != null && seats[i].stackSize === 0 && i != result.lastBet){
-  						seats[i].folded = true
-  					}
-  				}
-  			} 
-  			handleNextAction(result)
-  			//find next turn
-  			//option of checking
-  			/*if ((result.bet === 2 && result.turn === result.lastBet && result.street == 'preflop') || (result.bet === 0 && result.turn === result.button) ){
+  			result.turn = findNextPlayer(result, result.turn)
+  			//console.log(result.turn)
+  			if (result.turn === result.lastBet && !((result.bet === 2 && result.street == 'preflop') || 
+  				(result.bet === 0 && result.turn === result.lastBet))){
+  				//option of checking
   				nextStreet(result)
   			}
   			else{
-  				result.turn = findNextPlayer(result, result.turn)
-  				console.log(result.turn)
-  				if (result.turn === result.lastBet && !((result.bet === 2 && result.street == 'preflop') || 
-  					(result.bet === 0 && result.turn === result.button))){
-  					//option of checking
-  					nextStreet(result)
-  				}
-  				else{
-  					db.collection("gameState").update({}, result, function(err, result2){
-  						if (err) throw err;
-  						io.emit("game state", result)
-  					})
-  				}
+  				db.collection("gameState").update({}, result, function(err, result2){
+  					if (err) throw err;
+  					io.emit("game state", result)
+  				})
   			}
-  			*/
-  	    }
-  	})
-  })
-  socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
-    var obj = {"text":msg}
-    /*db.collection("messages").insert(obj, function(err, result){
-    	if (err) throw err;
+  		}
+  	}
 
-    })*/
-  });
-  socket.on('take seat', function(data){
-  	var seat = data.seat
-  	var uid = data.uid
-  	db.collection("gameState").findOne({}, function(err, result){
-  		if (err) throw err;
-  		var seats = result.seats
-  		var isValid = true
+  	socket.on('fold', function(){
+  		db.collection("gameState").findOne({}, function(err, result){
+  			if (err) throw err;
+  			var turn = result.turn
+  			var seats = result.seats
+  			seats[turn].folded = true
+  			var playersInHand = getPlayersInHand(seats)
+			if (playersInHand.length == 1){
+				//everyone folded
+				result.seats[playersInHand[0]].stackSize += result.pot
+				newGame(result)
+			}
+			else{
+				handleNextAction(result)
+			}
+
+  		})
+  	})
+
+  	socket.on('bet', function(bet){
+  		db.collection("gameState").findOne({}, function(err, result){
+  			if (err) throw err;
+  			var seats = result.seats;
+  			var turn = result.turn;
+  			var currentBet = result.bet
+  			if (seats[turn].stackSize + seats[turn].amountBet >= bet){
+  				seats[turn].stackSize -= bet - seats[turn].amountBet
+  				//raise
+  				if (bet > result.bet){
+  					result.previousRaise = bet - result.bet
+  					result.bet = bet
+  					result.lastBet = turn
+  				}
+  				result.pot += bet - seats[turn].amountBet;
+  				seats[turn].amountBet = bet
+  				/*if (seats[turn].stackSize === 0){
+  					seats[turn].folded = true
+  				}*/
+
+  				//if anyone is all in, they don't need to call a raise
+  				if (bet > 0){
+  					for (var i = 1; i <= 4; i++){
+  						if (seats[i] != null && seats[i].stackSize === 0 && i != result.lastBet){
+  							seats[i].folded = true
+  						}
+  					}
+  				} 
+  				handleNextAction(result)
+  	    	}
+  		})
+  	})
+
+  	socket.on('chat message', function(msg){
+    	io.emit('chat message', msg);
+  	});
+
+  	socket.on('take seat', function(data){
+  		var seat = data.seat
+  		var uid = data.uid
+  		db.collection("gameState").findOne({}, function(err, result){
+  			if (err) throw err;
+  			var seats = result.seats
+  			var isValid = true
 
   		/*for (var player of players){
   			if (player.uid == uid || player.seat == seat){
   				isValid = false
   			}
   		}*/
-  		if (seats[seat] != null){
-  			isValid = false
-  		}
-  		var seatNums = getSeatNums(seats)
-  		for (var seatNum of seatNums){
-  			if (seats[seatNum].uid == uid){
+  			if (seats[seat] != null){
   				isValid = false
   			}
-  		}
+  			var seatNums = getSeatNums(seats)
+  			for (var seatNum of seatNums){
+  				if (seats[seatNum].uid == uid){
+  					isValid = false
+  				}
+  			}
   		
-  		if (isValid){
-  			seats[seat] = {uid:uid, stackSize:200, folded:true, amountBet:0}
-  			seatNums.push(seat)
-  			if (seatNums.length == 2){
-  				//start game
-  				/*for (var seatNum of seatNums){
-  					seats[seatNum].folded = false
+  			if (isValid){
+  				seats[seat] = {uid:uid, stackSize:200, folded:true, amountBet:0, standUp:false}
+  				seatNums.push(seat)
+  				if (seatNums.length == 2){
+  					newGame(result)
   				}
-  				var playerIds =[]
-  				for (seatNum of seatNums){
-  					playerIds.push(seats[seatNum].uid)
+  				else{
+  					db.collection('gameState').update({}, result, function(err, result2){
+  						if (err) throw err;
+  						io.emit('game state', result)
+  					})
   				}
-  				dealCards(playerIds)
-  				result.button = seatNums[0]
-  				result.turn = seatNums[0];
-  				seats[seatNums[0]].amountBet = 1
-  				seats[seatNums[0]].stackSize -= 1
-  				seats[seatNums[1]].amountBet = 2
-  				seats[seatNums[1]].stackSize -= 2
-  				result.bet = 2;
-  				result.lastBet = seatNums[1]
-  				result.pot = 3;
-  				result.street = "preflop"
-  				result.community = []*/
-  				newGame(result)
   			}
-  			else{
-  				db.collection('gameState').update({}, result, function(err, result2){
-  					if (err) throw err;
-  					io.emit('game state', result)
-  				})
-  			}
-  		}
+  		})
   	})
-  })
+
+  	socket.on('stand up', function (uid){
+  		db.collection("gameState").findOne({}, function(err, result){
+  			if (err) throw err;
+  			for (var i = 1; i <= 4; i++){
+  				if (result.seats[i] != null && result.seats[i].uid === uid){
+  					result.seats[i].standUp = true
+  				} 
+  			}
+  			db.collection('gameState').update({}, result, function(err, result2){
+  				if (err) throw err;
+  				io.emit('game state', result)
+  			})
+  		})
+  	})
 });
 
 http.listen(port, function(){
