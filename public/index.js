@@ -179,8 +179,13 @@ $(function () {
         document.getElementById("betSpan").style.display = "block"
       }
     }
-
   })
+
+  socket.on('balance', function(diff){
+    balance -= diff;
+    document.getElementById('balance').innerHTML = "Balance: " + balance 
+  })
+  
   socket.on('connect', function(s){
     /*var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {

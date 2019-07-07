@@ -1,6 +1,7 @@
 var app = angular.module('pokerApp', ["firebase"]);
 var uid;
 var socket = io();
+var balance;
 
 app.controller("MyAuthCtrl", ["$scope", "$rootScope", "$http", "$firebaseAuth",
   function($scope, $rootScope, $http, $firebaseAuth) {
@@ -9,7 +10,18 @@ app.controller("MyAuthCtrl", ["$scope", "$rootScope", "$http", "$firebaseAuth",
       if (firebaseUser) {
           console.log("Signed in as:", firebaseUser.uid);
           uid = firebaseUser.uid
-          document.getElementById("myId").innerHTML = "My id: " + uid
+          document.getElementById("myId").innerHTML = "My id: " + uid;
+          var xmlHttp = new XMLHttpRequest();
+          xmlHttp.onreadystatechange = function() { 
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+              var response = JSON.parse(xmlHttp.responseText)
+              console.log(response)
+              balance = response.balance
+              document.getElementById("balance").innerHTML = "Balance: " + response.balance
+            }
+          }
+          xmlHttp.open("GET", "balance/" + uid, true); // true for asynchronous 
+          xmlHttp.send(null);
       } else {
           console.log("Signed out");
       }

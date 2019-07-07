@@ -3,19 +3,26 @@ const https = require("https"),
 	  MongoClient = require("mongodb").MongoClient,
 	  ObjectId = require('mongodb').ObjectId,
 	  path = require("path"),
+	  admin = require("firebase-admin")
 	  request = require("request"),
-	  express = require('express');
+	  serviceAccount = require('./accountKey.json'),
+	  express = require("express");
 	  
 var app = express()
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var http = require("http").Server(app);
+var io = require("socket.io")(http);
 var db;
 
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static("public"));
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://kenpoker-461cd.firebaseio.com"
+});
 
 var port = process.env.PORT || 3000;
 var connectedUsers = {}
@@ -309,12 +316,20 @@ function newGame(result){
 		seats[seatNum].folded = false;
 	}*/
 	for (var i = 1; i <= 4; i++){
-		if (seats[i] != null && !seats[i].standUp){
-			seats[i].amountBet = 0;
-			seats[i].folded = false
-		}
-		else{
-			seats[i] = null
+		if (seats[i] != null){
+			if (seats[i].standUp){
+				db.collection('balances').update({uid:seats[i].uid}, 
+ 					{$inc: {balance: seats[i].stackSize}}, 
+ 					function(err, result2){
+ 						if (err) throw err;
+ 					}
+ 				)
+				seats[i] = null
+			}
+			else{
+				seats[i].amountBet = 0;
+				seats[i].folded = false
+			}
 		}
 	}
 	var seatNums = getSeatNums(seats)
@@ -350,9 +365,9 @@ function newGame(result){
   		result.street = "preflop"
   		dealCards(playerIds)
 	}
-	else{
-		result.seats = [null, null, null, null, null]
-	}
+	//else{
+	//	result.seats = [null, null, null, null, null]
+	//}
 	
   	db.collection("gameState").update({}, result, function(err, result2){
   		if (err) throw err;
@@ -495,6 +510,13 @@ app.get('/messages', function(req, res){
 	})
 })
 
+app.get("/balance/:userId([0-9A-Za-z]*)", function(req, res){
+	db.collection("balances").findOne({uid:req.params.userId}, function(err, result){
+		if (err) throw err;
+		res.json(result)
+	})
+})
+
 io.on('connection', function(socket){
   	//console.log(socket)
   	socket.on('login', function(uid){
@@ -600,12 +622,6 @@ io.on('connection', function(socket){
   			if (err) throw err;
   			var seats = result.seats
   			var isValid = true
-
-  		/*for (var player of players){
-  			if (player.uid == uid || player.seat == seat){
-  				isValid = false
-  			}
-  		}*/
   			if (seats[seat] != null){
   				isValid = false
   			}
@@ -625,7 +641,13 @@ io.on('connection', function(socket){
   				else{
   					db.collection('gameState').update({}, result, function(err, result2){
   						if (err) throw err;
-  						io.emit('game state', result)
+						io.emit('game state', result)
+  						db.collection('balances').update({uid:uid}, {$inc: {balance: -200}}, function(err, result3){
+  							if (err) throw err;
+  							if (connectedUsers[uid]){
+  								connectedUsers[uid].emit('balance', -200)
+  							}
+  						})
   					})
   				}
   			}
@@ -638,9 +660,15 @@ io.on('connection', function(socket){
   			for (var i = 1; i <= 4; i++){
   				if (result.seats[i] != null && result.seats[i].uid === uid){
   					result.seats[i].standUp = true
+ 					db.collection('balances').update({uid:uid}, 
+ 						{$inc: {balance: result.seats[i].stackSize}}, 
+ 						function(err, result2){
+ 							if (err) throw err;
+ 						}
+ 					)
   				} 
   			}
-  			db.collection('gameState').update({}, result, function(err, result2){
+  			db.collection('gameState').update({}, result, function(err, result3){
   				if (err) throw err;
   				io.emit('game state', result)
   			})
@@ -652,9 +680,18 @@ http.listen(port, function(){
   console.log('listening on *:' + port);
 });
 
-/*MongoClient.connect("mongodb://heroku_vkbrcrpg:2e3eu4738uq1usfrplmquuben2@ds151707.mlab.com:51707/heroku_vkbrcrpg", function (err, client){
-	db = client.db("heroku_vkbrcrpg")
-})*/
+
 MongoClient.connect("mongodb://admin:password1@ds151707.mlab.com:51707/heroku_vkbrcrpg", function (err, client){
 	db = client.db("heroku_vkbrcrpg")
+	admin.auth().listUsers()
+    .then(function(listUsersResult) {
+	  
+      listUsersResult.users.forEach(function(userRecord) {
+        console.log(userRecord.uid)
+        //db.collection("balances").insertOne({uid:userRecord.uid, balance:10000})
+      });
+    })
+    .catch(function(error) {
+      console.log("Error listing users:", error);
+    });
 })
