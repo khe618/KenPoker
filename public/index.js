@@ -182,10 +182,10 @@ $(function () {
   })
 
   socket.on('balance', function(diff){
-    balance -= diff;
+    balance += diff;
     document.getElementById('balance').innerHTML = "Balance: " + balance 
   })
-  
+
   socket.on('connect', function(s){
     /*var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
