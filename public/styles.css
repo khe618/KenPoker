@@ -184,9 +184,3 @@
   margin-right: 1px;
 }
 
-.card:hover{
-  cursor: pointer;
-  z-index: 1;
-  -webkit-transform: translate(0px, -10px);
-  box-shadow: 0px 0px 5px 1px black;
-}

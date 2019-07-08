@@ -318,10 +318,13 @@ function newGame(result){
 	for (var i = 1; i <= 4; i++){
 		if (seats[i] != null){
 			if (seats[i].standUp || seats[i].stackSize == 0){
+				if (connectedUsers[seats[i].uid]){
+  					connectedUsers[seats[i].uid].emit('balance', seats[i].stackSize)
+  				}
 				db.collection('balances').update({uid:seats[i].uid}, 
  					{$inc: {balance: seats[i].stackSize}}, 
  					function(err, result2){
- 						if (err) throw err;
+ 						if (err) throw err;		
  					}
  				)
 				seats[i] = null
@@ -689,7 +692,7 @@ MongoClient.connect("mongodb://admin:password1@ds151707.mlab.com:51707/heroku_vk
 	  
       listUsersResult.users.forEach(function(userRecord) {
         console.log(userRecord.uid)
-        db.collection("balances").insertOne({uid:userRecord.uid, balance:10000})
+        //db.collection("balances").insertOne({uid:userRecord.uid, balance:10000})
       });
     })
     .catch(function(error) {

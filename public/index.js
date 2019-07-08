@@ -22,13 +22,28 @@ function initApp(socket){
   initApp();
 };*/
 
+function addCard(card){
+  //var selector = card.className.split(" ");
+  //var cardName = selector[1];
+  //var clonedDiv = $('.'+cardName).clone();
+  //clonedDiv.attr("onclick", "returnCard(this)"); 
+  //clonedDiv.addClass("on-table");
+  //clonedDiv.css("left", "");
+  var div = "<div class='card on-table' id='test' style='background-image:url(imgs/" + card + ".png)'></div>"
+  $('.picked-cards-area').append(div);
+  //$("."+cardName +":not(.on-table)").hide();
 
+  //pickedCards.push(cardName);
+
+}
 
 $(function () {
   /*function takeSeat(seatNum){
     socket.emit('take seat', {uid:uid, seat:seatNum})
   }*/
-
+  //addCard('3S')
+  //$('.on-table').remove();
+  //document.getElementByClass(picke)
   initApp(socket)
   var stack = document.getElementById('stack')
   var stackSize = 200;
@@ -156,10 +171,11 @@ $(function () {
     }
     document.getElementById("pot").innerHTML = state.pot
     document.getElementById("community").innerHTML = ""
-    console.log(state.community)
+    $('.on-table').remove();
     if (state.community){
       for (var j = 0; j < state.community.length; j++){
-        document.getElementById("community").innerHTML += state.community[j] + " " 
+        document.getElementById("community").innerHTML += state.community[j] + " "
+        addCard(state.community[j]) 
       }
     }
     for (var i = 1; i <= 4; i++){
