@@ -527,14 +527,15 @@ io.on('connection', function(socket){
   		db.collection("gameState").findOne({}, function(err, result){
   			if (err) throw err;
   			socket.emit('game state', result)
-  		})
-  		db.collection("cards").findOne({}, function(err, result){
-  			for (var player of result.players){
-  				if (player.uid == uid){
-  					socket.emit('cards', player.cards)
+  			db.collection("cards").findOne({}, function(err, result2){
+  				for (var player of result2.players){
+  					if (player.uid == uid){
+  						socket.emit('cards', player.cards)
+  					}
   				}
-  			}
+  			})
   		})
+  		
   	})
 
 

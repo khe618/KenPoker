@@ -118,7 +118,7 @@
 .picked-cards-area{
   background-color: #0d9461;
   width: 650px;
-  height: 180px;
+  height: 380px;
   left: 50%;
   
   margin-left: -325px;
@@ -135,6 +135,19 @@
   border-color: #c1ba23;
   border-radius: 50px;
 }
+
+.players_cards{
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50px;
+}
+
+.cards_box{
+    text-align:center;
+}
+
+
 @media only screen and (max-width: 674px) {
     .picked-cards-area {
       width: calc(100% - 10px);

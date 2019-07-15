@@ -51,6 +51,7 @@ $(function () {
   var amountBet;
   var currentBet;
   var player;
+  var mySeat;
   stack.innerHTML = stackSize;
   var slider = document.getElementById('m')
   slider.max = stackSize;
@@ -112,15 +113,17 @@ $(function () {
     $('#message_input').val('');
     return false;
   });
-  socket.on('chat message', function(msg){
-  });
+  
+
   socket.on('cards', function(cards){
-    var cardElem = document.getElementById('cards')
-    cardElem.style.display = 'block'
-    //cardElem.innerHTML = 'Cards: ' + cards[0] + cards[1]
-    document.getElementById("card0").src = "imgs/" + cards[0] + ".png"
-    document.getElementById("card1").src = "imgs/" + cards[1] + ".png"
+    //fix: do not assume myseat is defined
+    if (mySeat){
+      document.getElementById("seat" + mySeat + "_card0").src = "imgs/" + cards[0] + ".png"
+      document.getElementById("seat" + mySeat + "_card1").src = "imgs/" + cards[1] + ".png"
+    }
   })
+
+
   socket.on('game state', function(state){
     var found = false;
     var openSeats = []
@@ -128,6 +131,8 @@ $(function () {
       var player = state.seats[i]
       if (player !== null){
         if(player.uid == uid){
+          mySeat = i
+          console.log(mySeat)
           found = true
           stackSize = parseInt(player.stackSize)
           folded = player.folded
@@ -170,11 +175,9 @@ $(function () {
       
     }
     document.getElementById("pot").innerHTML = state.pot
-    document.getElementById("community").innerHTML = ""
     $('.on-table').remove();
     if (state.community){
       for (var j = 0; j < state.community.length; j++){
-        document.getElementById("community").innerHTML += state.community[j] + " "
         addCard(state.community[j]) 
       }
     }
