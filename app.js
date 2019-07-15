@@ -307,6 +307,20 @@ function findLastPlayer(result){
 	return lastPlayer
 }
 
+function showCards(result, cards){
+	var cardsToShow = []
+	for (var i = 1; i <= 4; i++){
+		if (!result.seats[i].folded){
+			for (var player of cards){
+				if (player.uid === result.seats[i].uid){
+					cardsToShow[i] = player.cards
+				}
+			}
+		}
+	}
+	socket.emit("showdown", cardsToShow)
+}
+
 
 function newGame(result){
 	var seats = result.seats
@@ -448,10 +462,9 @@ function nextStreet(result){
 		}
 		if (street == 'river'){
 			//console.log(playersInHand.map(x => result.seats[x].uid))
+			showCards(result, result2)
 			winners = determineWinners(result, result2, playersInHand.map(x => result.seats[x].uid))
-			/*for (var winner of winners){
-				result.seats[winner].stackSize += Math.floor(result.pot / winners.length)
-			}*/
+			
 			for (var i = 1; i<= 4; i++){
 				if (result.seats[i] !== null && winners.includes(result.seats[i].uid)){
 					result.seats[i].stackSize += Math.floor(result.pot / winners.length)

@@ -210,6 +210,10 @@ $(function () {
     document.getElementById('balance').innerHTML = "Balance: " + balance 
   })
 
+
+  socket.on('showdown', function(cards){
+    console.log(cards)
+  })
   socket.on('connect', function(s){
     /*var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
