@@ -311,7 +311,7 @@ function showCards(result, cards){
 	var cardsToShow = []
 	for (var i = 1; i <= 4; i++){
 		if (!result.seats[i].folded){
-			for (var player of cards){
+			for (var player of cards.players){
 				if (player.uid === result.seats[i].uid){
 					cardsToShow[i] = player.cards
 				}
