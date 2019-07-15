@@ -520,6 +520,7 @@ app.get("/balance/:userId([0-9A-Za-z]*)", function(req, res){
 	})
 })
 
+
 io.on('connection', function(socket){
   	//console.log(socket)
   	socket.on('login', function(uid){

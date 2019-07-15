@@ -59,15 +59,19 @@ $(function () {
     document.getElementById("raise").innerHTML = "Raise " + this.value
   }
   document.getElementById('seat1').onclick = function(){
+    mySeat = 1;
     socket.emit('take seat', {uid:uid, seat:1})
   }
   document.getElementById('seat2').onclick = function(){
+    mySeat = 2;
     socket.emit('take seat', {uid:uid, seat:2})
   }
   document.getElementById('seat3').onclick = function(){
+    mySeat = 3;
     socket.emit('take seat', {uid:uid, seat:3})
   }
   document.getElementById('seat4').onclick = function(){
+    mySeat = 4;
     socket.emit('take seat', {uid:uid, seat:4})
   }
   document.getElementById('fold').onclick = function(){
