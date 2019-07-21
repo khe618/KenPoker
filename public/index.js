@@ -213,6 +213,9 @@ $(function () {
 
   socket.on('showdown', function(cards){
     console.log(cards)
+    for (var i = 1; i <= 4; i++){
+      
+    }
   })
   socket.on('connect', function(s){
     /*var xhttp = new XMLHttpRequest();
