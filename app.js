@@ -260,7 +260,7 @@ function dealCards(players){
 
 function getSeatNums(seats){
 	var seatNums = []
-	for (var i = 1; i <= 4; i++){
+	for (var i = 0 i < 4; i++){
 		if (seats[i] !== null){
 			seatNums.push(i)
 		}
@@ -270,7 +270,7 @@ function getSeatNums(seats){
 
 function getPlayersInHand(seats){
 	var players = []
-	for (var i = 1; i <= 4; i++){
+	for (var i = 0; i < 4; i++){
 		if (seats[i] !== null && !seats[i].folded){
 			players.push(i)
 		}
@@ -309,7 +309,7 @@ function findLastPlayer(result){
 
 function showCards(result, cards){
 	var cardsToShow = []
-	for (var i = 1; i <= 4; i++){
+	for (var i = 0; i < 4; i++){
 		if (result.seats[i] != null && !result.seats[i].folded){
 			for (var player of cards.players){
 				if (player.uid === result.seats[i].uid){
@@ -328,7 +328,7 @@ function newGame(result){
 		seats[seatNum].amountBet = 0;
 		seats[seatNum].folded = false;
 	}*/
-	for (var i = 1; i <= 4; i++){
+	for (var i = 0; i < 4; i++){
 		if (seats[i] != null){
 			if (seats[i].standUp || seats[i].stackSize == 0){
 				if (connectedUsers[seats[i].uid]){
@@ -396,7 +396,7 @@ function nextStreet(result){
 		if (err) throw err;
 		var street = result.street
 		var seats = result.seats
-  		for (var i = 1; i <= 4; i++){
+  		for (var i = 0; i < 4; i++){
   			if (seats[i] != null && seats[i].stackSize === 0){
   				seats[i].folded = true
   			}
@@ -405,7 +405,7 @@ function nextStreet(result){
 		var sidePotPlayers = [];
 		var sidePots = [];
 		var isAllIn = false;
-		for (var i = 1; i <= 4; i++){
+		for (var i = 0; i < 4; i++){
 			var player = result.seats[i];
 			if (player !== null && player.amountBet > 0){
 				if (player.stackSize === 0){
@@ -449,7 +449,7 @@ function nextStreet(result){
 				}
 				for (var sidePot of result.sidePots){
 					winners = determineWinners(result, result2, sidePot.players)
-					for (var i = 1; i<= 4; i++){
+					for (var i = 0; i < 4; i++){
 						if (result.seats[i] !== null && winners.includes(result.seats[i].uid)){
 							result.seats[i].stackSize += Math.floor(sidePot.pot / winners.length)
 						}
@@ -464,7 +464,7 @@ function nextStreet(result){
 			showCards(result, result2)
 			winners = determineWinners(result, result2, playersInHand.map(x => result.seats[x].uid))
 			
-			for (var i = 1; i<= 4; i++){
+			for (var i = 0; i < 4; i++){
 				if (result.seats[i] !== null && winners.includes(result.seats[i].uid)){
 					result.seats[i].stackSize += Math.floor(result.pot / winners.length)
 				}
@@ -472,7 +472,7 @@ function nextStreet(result){
 			//determine sidepots
 			for (var sidePot of result.sidePots){
 				winners = determineWinners(result, result2, sidePot.players)
-				for (var i = 1; i<= 4; i++){
+				for (var i = 0; i < 4; i++){
 					if (result.seats[i] !== null && winners.includes(result.seats[i].uid)){
 						result.seats[i].stackSize += Math.floor(sidePot.pot / winners.length)
 					}
@@ -496,7 +496,7 @@ function nextStreet(result){
 			result.community[4] = result2.community[4]
 		}
 		//var seatNums = getSeatNums(result.seats)
-		for (var i = 1; i <= 4; i++){
+		for (var i = 0; i < 4; i++){
 			if(result.seats[i] !== null){
 				result.seats[i].amountBet = 0
 			}
@@ -620,7 +620,7 @@ io.on('connection', function(socket){
 
   				//if anyone is all in, they don't need to call a raise
   				if (bet > 0){
-  					for (var i = 1; i <= 4; i++){
+  					for (var i = 0; i < 4; i++){
   						if (seats[i] != null && seats[i].stackSize === 0 && i != result.lastBet){
   							seats[i].folded = true
   						}
@@ -678,7 +678,7 @@ io.on('connection', function(socket){
   	socket.on('stand up', function (uid){
   		db.collection("gameState").findOne({}, function(err, result){
   			if (err) throw err;
-  			for (var i = 1; i <= 4; i++){
+  			for (var i = 0; i < 4; i++){
   				if (result.seats[i] != null && result.seats[i].uid === uid){
   					result.seats[i].standUp = true
  					/*db.collection('balances').update({uid:uid}, 
