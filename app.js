@@ -260,7 +260,7 @@ function dealCards(players){
 
 function getSeatNums(seats){
 	var seatNums = []
-	for (var i = 0 i < 4; i++){
+	for (var i = 0; i < 4; i++){
 		if (seats[i] !== null){
 			seatNums.push(i)
 		}
