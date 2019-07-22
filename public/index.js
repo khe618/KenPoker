@@ -121,7 +121,7 @@ $(function () {
 
   socket.on('cards', function(cards){
     //fix: do not assume myseat is defined
-    if (mySeat){
+    if (mySeat != null){
       document.getElementById("seat" + mySeat + "_card0").src = "imgs/" + cards[0] + ".png"
       document.getElementById("seat" + mySeat + "_card1").src = "imgs/" + cards[1] + ".png"
     }
