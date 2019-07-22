@@ -66,11 +66,11 @@ $(function () {
     mySeat = 1;
     socket.emit('take seat', {uid:uid, seat:1})
   }
-  document.getElementById('seat3').onclick = function(){
+  document.getElementById('seat2').onclick = function(){
     mySeat = 2;
     socket.emit('take seat', {uid:uid, seat:2})
   }
-  document.getElementById('seat4').onclick = function(){
+  document.getElementById('seat3').onclick = function(){
     mySeat = 3;
     socket.emit('take seat', {uid:uid, seat:3})
   }
