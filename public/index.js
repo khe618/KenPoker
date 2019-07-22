@@ -131,7 +131,7 @@ $(function () {
   socket.on('game state', function(state){
     var found = false;
     var openSeats = []
-    for (var i = 1; i <= 4; i++){
+    for (var i = 0; i < 4; i++){
       var player = state.seats[i]
       if (player !== null){
         if(player.uid == uid){
@@ -185,7 +185,7 @@ $(function () {
         addCard(state.community[j]) 
       }
     }
-    for (var i = 1; i <= 4; i++){
+    for (var i = 0; i < 4; i++){
       document.getElementById("seat" + i).style.display = "none"
     }
     if (!found){
@@ -213,7 +213,7 @@ $(function () {
 
   socket.on('showdown', function(cards){
     console.log(cards)
-    for (var i = 1; i <= 4; i++){
+    for (var i = 0; i < 4; i++){
       
     }
   })
