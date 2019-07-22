@@ -193,11 +193,11 @@ $(function () {
         document.getElementById("seat" + seat).style.display = "block"
       }
     }
-    if (state.button){
+    if (state.button != null){
       document.getElementById("seat" + state.button + "info").innerHTML += " (button) "
     }
     document.getElementById("betSpan").style.display = "none"
-    if (state.turn){
+    if (state.turn != null){
       document.getElementById("seat" + state.turn + "info").innerHTML += " (action) "
       if (state.seats[state.turn].uid == uid){
         document.getElementById("betSpan").style.display = "block"
